@@ -4,6 +4,7 @@ import { MenuItemImage } from "./entity/menuItemImage";
 import { Cart } from "./entity/cart";
 import { Order } from "./entity/order";
 import { RestaurantAdmin } from "./entity/restaurantAdmin";
+import { OrderItem } from "./entity/orderItem";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -23,6 +24,8 @@ export const AppDataSource = new DataSource({
     MenuItemImage,
     Cart,
     Order,
+    OrderItem,
     RestaurantAdmin,
+    
   ],
 });

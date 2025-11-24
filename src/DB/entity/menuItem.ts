@@ -9,6 +9,7 @@ import {
 import { Restaurant } from "./restaurant";
 import { Category } from "./category";
 import { MenuItemImage } from "./menuItemImage";
+import { OrderItem } from "./orderItem";
 
 @Entity({ name: "menu_items" })
 export class MenuItem {
@@ -44,4 +45,7 @@ export class MenuItem {
 
   @OneToMany(() => MenuItemImage, (menuItemImage) => menuItemImage.menu_item)
   images!: MenuItemImage[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.menu_item)
+  orderItems!: OrderItem[];
 }

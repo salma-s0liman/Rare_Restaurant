@@ -5,12 +5,14 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  OneToMany,
 } from "typeorm";
 import { User } from "./user";
 import { Restaurant } from "./restaurant";
 import { Address } from "./address";
 import { orderStatusEnum } from "../../commen/enums/order.enum";
 import { paymentStatusEnum } from "../../commen/enums/payment.enum";
+import { OrderItem } from "./orderItem";
 
 @Entity({ name: "orders" })
 export class Order {
@@ -72,4 +74,7 @@ export class Order {
 
   @ManyToOne(() => Address, (address) => address.orders, { nullable: true })
   address?: Address;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  items!: OrderItem[];
 }
