@@ -11,7 +11,7 @@ import { User } from "./user";
 import { Restaurant } from "./restaurant";
 import { Address } from "./address";
 import { orderStatusEnum } from "../../commen/enums/order.enum";
-import { paymentStatusEnum } from "../../commen/enums/payment.enum";
+import { paymentMethodEnum, paymentStatusEnum } from "../../commen/enums/payment.enum";
 import { OrderItem } from "./orderItem";
 
 @Entity({ name: "orders" })
@@ -56,6 +56,13 @@ export class Order {
     default: paymentStatusEnum.pending,
   })
   payment_status?: paymentStatusEnum;
+
+    @Column({
+    type: "enum",
+    enum: paymentMethodEnum,
+    default: paymentMethodEnum.cash,
+  })
+  payment_method?: paymentMethodEnum;
 
   @Column({ type: "boolean", default: false })
   is_prepaid!: boolean;

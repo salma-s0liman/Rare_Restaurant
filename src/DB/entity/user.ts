@@ -10,7 +10,6 @@ import { Address } from "./address";
 import { Cart } from "./cart";
 import { RestaurantAdmin } from "./restaurantAdmin";
 import { Order } from "./order";
-import { DeliveryPerson } from "./deliveryPerson";
 
 @Entity({ name: "users" })
 export class User {
@@ -52,6 +51,12 @@ export class User {
   @Column({ type: "timestamp", nullable: true })
   lastLoginAt!: Date;
 
+  @Column({ type: "varchar", length: 255, })
+  vehicle_info?: string;
+
+  @Column({ type: "boolean", default: false })
+  is_active?: boolean;
+
   @OneToMany(() => Address, (address) => address.user)
   addresses!: Address[];
 
@@ -63,7 +68,4 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders!: Order[];
-
-  @OneToMany(() => DeliveryPerson, (deliveryPerson) => deliveryPerson.user)
-  deliveryPersons!: DeliveryPerson[];
 }
