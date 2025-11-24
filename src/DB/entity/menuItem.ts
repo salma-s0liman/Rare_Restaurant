@@ -1,4 +1,10 @@
-import { Restaurant, Category, MenuItemImage, OrderItem } from "./index";
+import {
+  Restaurant,
+  Category,
+  MenuItemImage,
+  OrderItem,
+  RatingReview,
+} from "./index";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -45,4 +51,7 @@ export class MenuItem {
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.menu_item)
   orderItems!: OrderItem[];
+
+  @OneToMany(() => RatingReview, (ratingReview) => ratingReview.menuItem)
+  ratingsReviews!: RatingReview[];
 }

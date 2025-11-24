@@ -11,6 +11,9 @@ import {
   OrderItem,
   RestaurantAdmin,
   OrderStatusHistory,
+  Delivery,
+  RatingReview,
+  ReviewResponse,
 } from "./entity/index";
 
 export const AppDataSource = new DataSource({
@@ -34,5 +37,8 @@ export const AppDataSource = new DataSource({
     OrderItem,
     RestaurantAdmin,
     OrderStatusHistory,
+    Delivery,
+    RatingReview,
+    ReviewResponse,
   ],
 });

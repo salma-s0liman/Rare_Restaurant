@@ -4,7 +4,6 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
-  JoinColumn,
 } from "typeorm";
 
 import { Order, User } from "./index";

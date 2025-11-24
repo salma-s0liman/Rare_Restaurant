@@ -1,3 +1,5 @@
+import { genderEnum, userRoleEnum } from "../../commen/";
+import { Address, Cart, RestaurantAdmin, Order, RatingReview, ReviewResponse } from "./index";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,11 +7,6 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
-import { genderEnum, userRoleEnum } from "../../commen/";
-import { Address } from "./address";
-import { Cart } from "./cart";
-import { RestaurantAdmin } from "./restaurantAdmin";
-import { Order } from "./order";
 
 @Entity({ name: "users" })
 export class User {
@@ -51,7 +48,7 @@ export class User {
   @Column({ type: "timestamp", nullable: true })
   lastLoginAt!: Date;
 
-  @Column({ type: "varchar", length: 255, })
+  @Column({ type: "varchar", length: 255 })
   vehicle_info?: string;
 
   @Column({ type: "boolean", default: false })
@@ -68,4 +65,10 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders!: Order[];
+
+  @OneToMany(() => RatingReview, (ratingReview) => ratingReview.user)
+  ratingsReviews!: RatingReview[];
+
+  @OneToMany(() => ReviewResponse, (reviewResponse) => reviewResponse.responder)
+  reviewResponses!: ReviewResponse[];
 }

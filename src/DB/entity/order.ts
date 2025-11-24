@@ -13,6 +13,8 @@ import {
   Address,
   OrderItem,
   OrderStatusHistory,
+  Delivery,
+  RatingReview,
 } from "./index";
 
 import {
@@ -94,4 +96,10 @@ export class Order {
 
   @OneToMany(() => OrderStatusHistory, (statusHistory) => statusHistory.order)
   statusHistory!: OrderStatusHistory[];
+
+  @OneToMany(() => Delivery, (delivery) => delivery.order)
+  delivery!: Delivery[];
+
+  @OneToMany(() => RatingReview, (ratingReview) => ratingReview.order)
+  ratingsReviews!: RatingReview[];
 }
