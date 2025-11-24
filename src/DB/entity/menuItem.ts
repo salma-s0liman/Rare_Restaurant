@@ -1,3 +1,4 @@
+import { Restaurant, Category, MenuItemImage, OrderItem } from "./index";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,10 +7,6 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
-import { Restaurant } from "./restaurant";
-import { Category } from "./category";
-import { MenuItemImage } from "./menuItemImage";
-import { OrderItem } from "./orderItem";
 
 @Entity({ name: "menu_items" })
 export class MenuItem {

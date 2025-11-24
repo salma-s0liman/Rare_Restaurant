@@ -1,3 +1,4 @@
+import { User, Order } from "./index";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,8 +7,6 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
-import { User } from "./user";
-import { Order } from "./order";
 
 @Entity({ name: "addresses" })
 export class Address {
@@ -33,8 +32,8 @@ export class Address {
   created_at?: Date;
 
   @ManyToOne(() => User, (user) => user.addresses, { onDelete: "CASCADE" })
-    user!: User;
-    
-    @OneToMany(() => Order, (order) => order.address)
-    orders!: Order[];
+  user!: User;
+
+  @OneToMany(() => Order, (order) => order.address)
+  orders!: Order[];
 }

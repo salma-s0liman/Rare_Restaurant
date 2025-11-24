@@ -7,12 +7,19 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
-import { User } from "./user";
-import { Restaurant } from "./restaurant";
-import { Address } from "./address";
-import { orderStatusEnum } from "../../commen/enums/order.enum";
-import { paymentMethodEnum, paymentStatusEnum } from "../../commen/enums/payment.enum";
-import { OrderItem } from "./orderItem";
+import {
+  User,
+  Restaurant,
+  Address,
+  OrderItem,
+  OrderStatusHistory,
+} from "./index";
+
+import {
+  orderStatusEnum,
+  paymentMethodEnum,
+  paymentStatusEnum,
+} from "../../commen/";
 
 @Entity({ name: "orders" })
 export class Order {
@@ -57,7 +64,7 @@ export class Order {
   })
   payment_status?: paymentStatusEnum;
 
-    @Column({
+  @Column({
     type: "enum",
     enum: paymentMethodEnum,
     default: paymentMethodEnum.cash,
@@ -84,4 +91,7 @@ export class Order {
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
   items!: OrderItem[];
+
+  @OneToMany(() => OrderStatusHistory, (statusHistory) => statusHistory.order)
+  statusHistory!: OrderStatusHistory[];
 }

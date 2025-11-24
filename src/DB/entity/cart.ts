@@ -1,4 +1,4 @@
-// cart.ts
+import { User, Restaurant } from "./index";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,8 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Restaurant } from "./restaurant";
-import { User } from "./user";
 
 @Entity({ name: "carts" })
 export class Cart {

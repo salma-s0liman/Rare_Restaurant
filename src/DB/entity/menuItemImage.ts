@@ -1,3 +1,4 @@
+import { MenuItem } from "./menuItem";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,7 +6,6 @@ import {
   ManyToOne,
   CreateDateColumn,
 } from "typeorm";
-import { MenuItem } from "./menuItem";
 
 @Entity({ name: "menu_item_images" })
 export class MenuItemImage {

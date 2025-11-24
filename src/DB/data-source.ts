@@ -1,10 +1,17 @@
 import { DataSource } from "typeorm";
-import { Address, Category, MenuItem, Restaurant, User } from "./entity";
-import { MenuItemImage } from "./entity/menuItemImage";
-import { Cart } from "./entity/cart";
-import { Order } from "./entity/order";
-import { RestaurantAdmin } from "./entity/restaurantAdmin";
-import { OrderItem } from "./entity/orderItem";
+import {
+  User,
+  Address,
+  Restaurant,
+  Category,
+  MenuItem,
+  MenuItemImage,
+  Cart,
+  Order,
+  OrderItem,
+  RestaurantAdmin,
+  OrderStatusHistory,
+} from "./entity/index";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -26,6 +33,6 @@ export const AppDataSource = new DataSource({
     Order,
     OrderItem,
     RestaurantAdmin,
-    
+    OrderStatusHistory,
   ],
 });

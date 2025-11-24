@@ -1,7 +1,11 @@
-// category.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
-import { Restaurant } from "./restaurant";
-import { MenuItem } from "./menuItem";
+import { Restaurant, MenuItem } from "./index";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 
 @Entity({ name: "categories" })
 export class Category {
@@ -17,8 +21,8 @@ export class Category {
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.categories, {
     onDelete: "CASCADE",
   })
-    restaurant!: Restaurant;
-    
-    @OneToMany(() => MenuItem, (menuItem) => menuItem.category)
-    menu_items!: MenuItem[];
+  restaurant!: Restaurant;
+
+  @OneToMany(() => MenuItem, (menuItem) => menuItem.category)
+  menu_items!: MenuItem[];
 }
