@@ -46,4 +46,5 @@ export const globalErrorHandling = (error: IError, req: Request, res: Response, 
             stack: process.env.MOOD === "development"? error.stack : undefined,
             cause: error.cause
         })
-    }
+}
+    

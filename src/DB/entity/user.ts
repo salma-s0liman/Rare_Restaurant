@@ -10,6 +10,7 @@ import { Address } from "./address";
 import { Cart } from "./cart";
 import { RestaurantAdmin } from "./restaurantAdmin";
 import { Order } from "./order";
+import { DeliveryPerson } from "./deliveryPerson";
 
 @Entity({ name: "users" })
 export class User {
@@ -62,4 +63,7 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders!: Order[];
+
+  @OneToMany(() => DeliveryPerson, (deliveryPerson) => deliveryPerson.user)
+  deliveryPersons!: DeliveryPerson[];
 }
