@@ -21,7 +21,7 @@ import {
   orderStatusEnum,
   paymentMethodEnum,
   paymentStatusEnum,
-} from "../../commen/";
+} from "../../common";
 
 @Entity({ name: "orders" })
 export class Order {

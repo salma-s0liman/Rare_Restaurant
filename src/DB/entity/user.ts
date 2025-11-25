@@ -1,4 +1,4 @@
-import { genderEnum, userRoleEnum } from "../../commen/";
+import { genderEnum, userRoleEnum } from "../../common";
 import { Address, Cart, RestaurantAdmin, Order, RatingReview, ReviewResponse } from "./index";
 import {
   Entity,
