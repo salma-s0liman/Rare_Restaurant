@@ -51,7 +51,7 @@ export class User {
   @Column({ type: "varchar", length: 255 })
   vehicle_info?: string;
 
-  @Column({ type: "boolean", default: false })
+  @Column({ type: "boolean", default: null })
   is_active?: boolean;
 
   @OneToMany(() => Address, (address) => address.user)
