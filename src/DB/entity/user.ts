@@ -7,12 +7,13 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "users" })
 export class User {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
-
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
+  id: string = uuidv4().toString();
+  
   @Column({ type: "varchar", length: 100 })
   firstName!: string;
 
@@ -55,20 +56,22 @@ export class User {
   is_active?: boolean;
 
   @OneToMany(() => Address, (address) => address.user)
-  addresses!: Address[];
+  addresses?: Address[];
 
   @OneToMany(() => Cart, (cart) => cart.user)
-  carts!: Cart[];
+  carts?: Cart[];
 
   @OneToMany(() => RestaurantAdmin, (admin) => admin.user)
-  adminRoles!: RestaurantAdmin[];
+  adminRoles?: RestaurantAdmin[];
 
   @OneToMany(() => Order, (order) => order.user)
-  orders!: Order[];
+  orders?: Order[];
 
   @OneToMany(() => RatingReview, (ratingReview) => ratingReview.user)
-  ratingsReviews!: RatingReview[];
+  ratingsReviews?: RatingReview[];
 
   @OneToMany(() => ReviewResponse, (reviewResponse) => reviewResponse.responder)
-  reviewResponses!: ReviewResponse[];
+  reviewResponses?: ReviewResponse[];
 }
+
+

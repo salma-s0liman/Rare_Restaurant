@@ -1,23 +1,21 @@
 import { Order, User } from "./index";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "deliveries" })
 export class Delivery {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   assigned_at?: Date;
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   accepted_at?: Date;
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   completed_at?: Date;
 
-  // ---------------- RELATIONS -----------------
-
-  // Each delivery belongs to one order
   @ManyToOne(() => Order, (order) => order.delivery, {
     onDelete: "CASCADE",
   })

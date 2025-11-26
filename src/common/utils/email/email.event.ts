@@ -1,14 +1,11 @@
 import { EventEmitter } from "node:events";
-import Mail from "nodemailer/lib/mailer";
 import { sendEmail } from "./send.email";
 import { verifyEmail } from "./verify.template.email";
+import { IEmail } from "../../interfaces";
 
 export const emailEvent = new EventEmitter();
 
-export interface IEmail extends Mail.Options {
-  otp: string;
-  email: string;
-}
+
 
 emailEvent.on("ConfirmEmail", async (data: IEmail) => {
   try {

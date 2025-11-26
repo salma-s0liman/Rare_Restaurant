@@ -9,12 +9,13 @@ import {
   Unique,
   OneToMany,
 } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "ratings_reviews" })
 @Unique(["user_id", "menu_item_id", "order_id"])
 export class RatingReview {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({ type: "uuid" })
   user_id!: string;
@@ -34,10 +35,8 @@ export class RatingReview {
   @Column({ type: "boolean", default: true })
   is_visible!: boolean;
 
-  @CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at!: Date;
-
-  // ---------------- RELATIONS -----------------
 
   @ManyToOne(() => User, (user) => user.ratingsReviews, {
     onDelete: "CASCADE",

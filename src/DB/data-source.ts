@@ -14,6 +14,7 @@ import {
   Delivery,
   RatingReview,
   ReviewResponse,
+  CartItem,
 } from "./entity/index";
 
 export const AppDataSource = new DataSource({
@@ -40,5 +41,6 @@ export const AppDataSource = new DataSource({
     Delivery,
     RatingReview,
     ReviewResponse,
+    CartItem,
   ],
 });

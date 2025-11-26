@@ -9,4 +9,11 @@ router.post(
   validation(validators.signupValidation),
   authService.signup
 );
+
+router.post(
+  "/login",
+  validation(validators.loginValidation),
+  authService.login
+);
+
 export default router;
