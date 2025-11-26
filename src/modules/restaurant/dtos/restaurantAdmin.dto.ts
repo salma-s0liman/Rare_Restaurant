@@ -10,3 +10,8 @@ export class CreateRestaurantAdminDto {
   @IsString()
   role!: string; 
 }
+
+export class UpdateRestaurantAdminRoleDto {
+  @IsString()
+  role!: string; 
+}
