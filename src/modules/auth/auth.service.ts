@@ -1,15 +1,18 @@
-import { ISignupBodyInputsDto } from "./auth.dto";
-import { userRepository } from "./auth.repository";
+import type { Request, Response, NextFunction } from "express";
+import { ILoginBodyInputsDto, ISignupBodyInputsDto } from "./auth.dto";
+import { userRepository } from "../user/user.repository";
 import {
   ApplicationException,
+  BadRequestException,
+  compareHash,
   ConflictException,
   genderEnum,
   generateEncryption,
   generateHash,
   userRoleEnum,
+  emailEvent,
+  generateAuthTokens,
 } from "../../common";
-import type { Request, Response, NextFunction } from "express";
-import { emailEvent } from "../../common/utils/email";
 
 class AuthenticationService {
   constructor() {}
@@ -38,7 +41,6 @@ class AuthenticationService {
       );
     }
 
-    // note: create() in our BaseRepository returns the single object, not an array
     const user = await userRepository.create({
       firstName: firstName || "",
       lastName: lastName || "",
@@ -57,13 +59,56 @@ class AuthenticationService {
 
     emailEvent.emit("ConfirmEmail", {
       email: user.email,
-      otp: "123456", 
+      otp: String(Math.floor(Math.random() * (999999 - 100000 + 1) + 100000)),
     });
 
     return res.status(201).json({
       message: "User created successfully",
       userId: user.id,
       date: user,
+    });
+  };
+
+  login = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response> => {
+    const { email, password } = req.body as ILoginBodyInputsDto;
+
+    const user = await userRepository.findOne({
+      where: { email },
+      select: ["id", "email", "password", "role", "firstName", "lastName"],
+    });
+
+    if (!user) {
+      throw new BadRequestException("Invalid email or password");
+    }
+
+    if (!(await compareHash(password, user.password))) {
+      throw new BadRequestException("Invalid email or password");
+    }
+
+    // 5. Generate Token
+    const token = await generateAuthTokens({
+      payload: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    });
+    console.log(token);
+
+    return res.status(200).json({
+      message: "Login successful",
+      token: token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
     });
   };
 }
