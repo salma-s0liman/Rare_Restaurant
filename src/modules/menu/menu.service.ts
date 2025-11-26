@@ -31,8 +31,8 @@ class MenuService {
         (restaurant) => ({
           id: restaurant.id,
           name: restaurant.name,
-          address: restaurant.address,
-          phone: restaurant.phone,
+          address: restaurant.address || "",
+          phone: restaurant.phone || "",
           is_active: restaurant.is_active || false,
           categories_count: restaurant.categories?.length || 0,
           menu_items_count: restaurant.menu_items?.length || 0,
@@ -68,8 +68,8 @@ class MenuService {
       const restaurantDto: RestaurantListDto = {
         id: restaurant.id,
         name: restaurant.name,
-        address: restaurant.address,
-        phone: restaurant.phone,
+        address: restaurant.address || "",
+        phone: restaurant.phone || "",
         is_active: restaurant.is_active || false,
         categories_count: restaurant.categories?.length || 0,
         menu_items_count: restaurant.menu_items?.length || 0,
@@ -179,8 +179,8 @@ class MenuService {
         restaurant: {
           id: result.restaurant.id,
           name: result.restaurant.name,
-          address: result.restaurant.address,
-          phone: result.restaurant.phone,
+          address: result.restaurant.address || "",
+          phone: result.restaurant.phone || "",
           is_active: result.restaurant.is_active || false,
         },
         categories: categoriesDto,
