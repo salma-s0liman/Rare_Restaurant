@@ -14,6 +14,7 @@ import rateLimit from "express-rate-limit";
 
 //import  module routing
 import authController from "./modules/auth/auth.controller";
+import { menuController } from "./modules/menu";
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 
@@ -48,8 +49,63 @@ const bootstrap = (): void => {
     res.json({ message: `hello to my ${process.env.APPLICATION_NAME}` });
   });
 
+  // Health check endpoint
+  app.get("/health", async (req: Request, res: Response) => {
+    let dbConnected = false;
+    let dbError = null;
+
+    try {
+      // Check if DataSource is initialized and can execute a simple query
+      if (AppDataSource.isInitialized) {
+        await AppDataSource.query("SELECT 1");
+        dbConnected = true;
+      }
+    } catch (error) {
+      dbError =
+        error instanceof Error ? error.message : "Unknown database error";
+    }
+
+    const healthStatus = {
+      status: dbConnected ? "OK" : "DEGRADED",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      application: {
+        name: process.env.APPLICATION_NAME || "Rare Restaurant",
+        version: "1.0.0",
+        environment: process.env.MODE || "development",
+      },
+      database: {
+        connected: dbConnected,
+        initialized: AppDataSource.isInitialized,
+        type: "mysql",
+        ...(dbError && { error: dbError }),
+      },
+      server: {
+        port: process.env.PORT || 5000,
+        memory: {
+          used:
+            Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + " MB",
+          total:
+            Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + " MB",
+        },
+      },
+    };
+
+    const statusCode = dbConnected ? 200 : 503;
+    const message = dbConnected
+      ? "Server is healthy"
+      : "Server is running but database connection issues detected";
+
+    res.status(statusCode).json({
+      success: dbConnected,
+      message: message,
+      data: healthStatus,
+    });
+  });
+
   // sub-app-routing-modules
   app.use("/auth", authController);
+  app.use("/api", menuController);
 
   //In-valid routing
   app.use("{/*dumy}", (req: Request, res: Response) => {

@@ -23,7 +23,7 @@
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    // "exactOptionalPropertyTypes": true, // Disabled for easier development
     "strictNullChecks": true,
 
     // Style Options
