@@ -16,14 +16,18 @@ import {
   ReviewResponse,
   CartItem,
 } from "./entity/index";
+import dotenv from "dotenv";
+import { ENV } from "../config/env";
+
+dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: process.env.DATABASE_HOST || "",
-  port: process.env.DATABASE_PORT as unknown as number,
-  username: process.env.DATABASE_USERNAME || "",
-  password: process.env.DATABASE_PASSWORD || "",
-  database: process.env.DATABASE_NAME || "",
+  host: ENV.DB_HOST,
+  port: ENV.DB_PORT,
+  username: ENV.DB_USER,
+  password: ENV.DB_PASSWORD,
+  database: ENV.DB_NAME,
   synchronize: true,
   logging: false,
   entities: [

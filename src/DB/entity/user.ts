@@ -43,11 +43,11 @@ export class User {
   @Column()
   password!: string;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn()
   createdAt?: Date;
 
   @Column({ type: "timestamp", nullable: true })
-  lastLoginAt!: Date;
+  lastLoginAt?: Date;
 
   @Column({ type: "varchar", length: 255 })
   vehicle_info?: string;

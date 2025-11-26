@@ -15,8 +15,8 @@ export class Cart {
   @PrimaryGeneratedColumn("uuid")
   id: string = uuidv4().toString();
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  created_at!: Date;
+  @CreateDateColumn({ type: "timestamp", nullable: true })
+  created_at?: Date;
 
   @UpdateDateColumn({ type: "timestamp", nullable: true })
   updated_at?: Date;
