@@ -7,11 +7,12 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "addresses" })
 export class Address {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({ type: "varchar", length: 255 })
   street!: string;
@@ -26,14 +27,14 @@ export class Address {
   country!: string;
 
   @Column({ type: "boolean", default: false })
-  is_primary!: boolean;
+  is_primary: boolean = false;
 
-  @CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
-  created_at?: Date;
+  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  created_at!: Date;
 
   @ManyToOne(() => User, (user) => user.addresses, { onDelete: "CASCADE" })
   user!: User;
 
   @OneToMany(() => Order, (order) => order.address)
-  orders!: Order[];
+  orders?: Order[];
 }

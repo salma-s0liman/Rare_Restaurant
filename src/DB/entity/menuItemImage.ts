@@ -6,11 +6,12 @@ import {
   ManyToOne,
   CreateDateColumn,
 } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "menu_item_images" })
 export class MenuItemImage {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({ type: "varchar", length: 1000 })
   url!: string;
@@ -19,10 +20,10 @@ export class MenuItemImage {
   alt_text?: string;
 
   @Column({ type: "boolean", default: false })
-  is_primary!: boolean;
+  is_primary: boolean = false;
 
   @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  created_at?: Date;
+  created_at!: Date;
 
   // Relation to MenuItem
   @ManyToOne(() => MenuItem, (menuItem) => menuItem.images, {

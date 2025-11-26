@@ -7,13 +7,13 @@ import {
 } from "typeorm";
 
 import { Order, User } from "./index";
-
+import { v4 as uuidv4 } from "uuid";
 import { orderStatusEnum, userRoleEnum } from "../../common";
 
 @Entity({ name: "order_status_history" })
 export class OrderStatusHistory {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({
     type: "enum",
@@ -27,10 +27,6 @@ export class OrderStatusHistory {
     enum: orderStatusEnum,
   })
   new_status!: orderStatusEnum;
-
-  @Column({ type: "uuid", nullable: true })
-  changed_by_user_id?: string;
-  // nullable because system actions create logs
 
   @Column({
     type: "enum",

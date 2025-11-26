@@ -13,3 +13,4 @@ export * from "./orderStatusHistory";
 export * from "./delivery";
 export * from "./ratingReview";
 export * from "./reviewResponse";
+export * from "./cartItems";

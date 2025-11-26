@@ -7,11 +7,12 @@ import {
   JoinColumn,
   CreateDateColumn,
 } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "review_responses" })
 export class ReviewResponse {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({ type: "uuid" })
   rating_id!: string;

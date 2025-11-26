@@ -6,11 +6,12 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "categories" })
 export class Category {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({ type: "varchar", length: 150 })
   name!: string;
@@ -24,5 +25,5 @@ export class Category {
   restaurant!: Restaurant;
 
   @OneToMany(() => MenuItem, (menuItem) => menuItem.category)
-  menu_items!: MenuItem[];
+  menu_items?: MenuItem[];
 }

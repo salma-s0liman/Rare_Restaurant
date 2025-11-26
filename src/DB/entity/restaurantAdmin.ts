@@ -8,18 +8,19 @@ import {
 } from "typeorm";
 import { Restaurant } from "./restaurant";
 import { User } from "./user";
+import { v4 as uuidv4 } from "uuid";
 import { restaurantAdminRoleEnum } from "../../common/enums/restaurant.enum";
 
 @Entity({ name: "restaurant_admins" })
 export class RestaurantAdmin {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({ type: "enum", enum: restaurantAdminRoleEnum, default: restaurantAdminRoleEnum.owner })
-  role?: restaurantAdminRoleEnum;
+  role!: restaurantAdminRoleEnum;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  created_at?: Date;
+  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  created_at!: Date;
 
   // Relation to Restaurant
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.admins, {
