@@ -3,7 +3,7 @@ import { genderEnum, userRoleEnum } from "../../commen";
 
 export const signupValidation = {
   body: z
-    .object({
+    .strictObject({
       id: z.uuid().optional(),
       firstName: z
         .string({
@@ -17,18 +17,20 @@ export const signupValidation = {
         })
         .min(3)
         .max(20),
-      phone: z
-        .string()
-        .regex(/^(002|\+2)?01[0125][0-9]{8}$/, {
-          error: "Invalid phone number",
-        }),
+      phone: z.string().regex(/^(002|\+2)?01[0125][0-9]{8}$/, {
+        error: "Invalid phone number",
+      }),
       email: z.email(),
-      gender: z.enum(genderEnum, {
-        error: "Invalid gender type, Expected male, female or other",
-      }).optional(),
-      role: z.enum(userRoleEnum, {
-        error: "Invalid role type, Expected customer, delivery or admin",
-      }).optional(),
+      gender: z
+        .enum(genderEnum, {
+          error: "Invalid gender type, Expected male, female or other",
+        })
+        .optional(),
+      role: z
+        .enum(userRoleEnum, {
+          error: "Invalid role type, Expected customer, delivery or admin",
+        })
+        .optional(),
       vehicleInfo: z.string().min(1).optional().nullable(),
       isActive: z.boolean().optional().default(false),
       password: z
@@ -65,4 +67,11 @@ export const signupValidation = {
         }
       }
     }),
+};
+
+export const loginValidation = {
+  body: z.strictObject({
+    email: z.email(),
+    password: z.string().min(8),
+  }),
 };

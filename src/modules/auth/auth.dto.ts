@@ -1,12 +1,15 @@
 import { genderEnum, userRoleEnum } from "../../commen";
 
-export interface ISignupBodyInputsDto {
+export interface ILoginBodyInputsDto {
+  email: string;
+  password: string;
+}
+
+export interface ISignupBodyInputsDto extends ILoginBodyInputsDto {
   id?: string;
   firstName: string;
   lastName: string;
-  email: string;
   phone: string;
-  password: string;
   confirmPassword: string;
   gender?: genderEnum;
   role?: userRoleEnum;
