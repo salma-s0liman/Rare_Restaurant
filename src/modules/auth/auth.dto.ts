@@ -1,18 +1,10 @@
-import { genderEnum, userRoleEnum } from "../../common";
+import z from "zod";
+import * as validators from "./auth.validation";
 
-export interface ILoginBodyInputsDto {
-  email: string;
-  password: string;
-}
+export type ISignupBodyInputsDto = z.infer<
+  typeof validators.signupValidation.body
+>;
 
-export interface ISignupBodyInputsDto extends ILoginBodyInputsDto {
-  id?: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  confirmPassword: string;
-  gender?: genderEnum;
-  role?: userRoleEnum;
-  vehicleInfo?: string | null;
-  isActive?: boolean;
-}
+export type ILoginBodyInputsDto = z.infer<
+  typeof validators.loginValidation.body
+>;
