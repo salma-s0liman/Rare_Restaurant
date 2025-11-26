@@ -7,13 +7,13 @@ export class Delivery {
   @PrimaryGeneratedColumn("uuid")
   id: string = uuidv4().toString();
 
-  @Column({ type: "timestamptz", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   assigned_at?: Date;
 
-  @Column({ type: "timestamptz", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   accepted_at?: Date;
 
-  @Column({ type: "timestamptz", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   completed_at?: Date;
 
   @ManyToOne(() => Order, (order) => order.delivery, {

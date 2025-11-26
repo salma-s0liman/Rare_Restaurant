@@ -19,7 +19,7 @@ export class RestaurantAdmin {
   @Column({ type: "enum", enum: restaurantAdminRoleEnum, default: restaurantAdminRoleEnum.owner })
   role!: restaurantAdminRoleEnum;
 
-  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at!: Date;
 
   // Relation to Restaurant

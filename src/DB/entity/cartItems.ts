@@ -30,6 +30,6 @@ export class CartItem {
   @Column({ type: "decimal", precision: 10, scale: 2, name: "price_at_add" })
   priceAtAdd!: number;
 
-  @CreateDateColumn({ type: "timestamptz", name: "added_at" })
+  @CreateDateColumn({ type: "timestamp", name: "added_at" })
   addedAt!: Date;
 }

@@ -43,10 +43,10 @@ export class User {
   @Column()
   password!: string;
 
-  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt?: Date;
 
-  @Column({ type: "timestamptz", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   lastLoginAt!: Date;
 
   @Column({ type: "varchar", length: 255 })

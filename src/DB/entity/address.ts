@@ -29,7 +29,7 @@ export class Address {
   @Column({ type: "boolean", default: false })
   is_primary: boolean = false;
 
-  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at!: Date;
 
   @ManyToOne(() => User, (user) => user.addresses, { onDelete: "CASCADE" })

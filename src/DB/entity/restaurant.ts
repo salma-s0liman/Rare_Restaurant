@@ -32,7 +32,7 @@ export class Restaurant {
   @Column({ type: "boolean", default: true })
   is_active: boolean = true;
 
-  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     created_at!: Date;
     
     @OneToMany(() => Category, (category) => category.restaurant)

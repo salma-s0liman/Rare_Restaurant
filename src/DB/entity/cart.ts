@@ -15,10 +15,10 @@ export class Cart {
   @PrimaryGeneratedColumn("uuid")
   id: string = uuidv4().toString();
 
-  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at!: Date;
 
-  @UpdateDateColumn({ type: "timestamptz", nullable: true })
+  @UpdateDateColumn({ type: "timestamp", nullable: true })
   updated_at?: Date;
 
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.carts, {
