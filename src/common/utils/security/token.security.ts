@@ -1,6 +1,5 @@
 import { userRepository } from "../../../modules/user/user.repository";
 import jwt from "jsonwebtoken";
-import { User } from "../../../DB";
 import {
   ApplicationException,
   IDecodeParams,
@@ -8,6 +7,7 @@ import {
   signatureTypeEnum,
   tokenTypeEnum,
 } from "../..";
+import { User } from "../../../DB";
 
 // 2. Generate Token
 export const generateToken = async ({
@@ -107,20 +107,20 @@ export const decodedToken = async ({
 
 export const generateAuthTokens = async (
   payload: any,
-  roleLevel: string = "Bearer" 
+  roleLevel: string = "Bearer"
 ): Promise<{ accessToken: string; refreshToken: string } | void> => {
   const signatures = getSignature(roleLevel);
 
-  // 2. Generate Access Token 
+  // 2. Generate Access Token
   const accessToken = await generateToken({
     payload,
     signature: signatures.accessSignature,
     options: {
-      expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRATION_IN) || "1h", 
+      expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRATION_IN) || "1h",
     },
   });
 
-  // 3. Generate Refresh Token 
+  // 3. Generate Refresh Token
   const refreshToken = await generateToken({
     payload,
     signature: signatures.refreshSignature,
