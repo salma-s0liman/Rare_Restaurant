@@ -54,10 +54,10 @@ export class Order {
   @Column({ type: "decimal" })
   total_amount!: number;
 
-  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   placed_at?: Date;
 
-  @Column({ type: "timestamptz", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   paid_at?: Date;
 
   @Column({
