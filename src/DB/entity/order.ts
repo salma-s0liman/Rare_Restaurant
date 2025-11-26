@@ -22,21 +22,22 @@ import {
   paymentMethodEnum,
   paymentStatusEnum,
 } from "../../common";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: "orders" })
 export class Order {
   @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  id: string = uuidv4().toString();
 
   @Column({ type: "varchar", length: 100 })
-  order_number!: string; // e.g., REST-20251124-0001
+  order_number!: string;
 
   @Column({
     type: "enum",
     enum: orderStatusEnum,
     default: orderStatusEnum.placed,
   })
-  status?: orderStatusEnum;
+  status!: orderStatusEnum;
 
   @Column({ type: "decimal" })
   subtotal!: number;
@@ -53,10 +54,10 @@ export class Order {
   @Column({ type: "decimal" })
   total_amount!: number;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   placed_at?: Date;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: "timestamptz", nullable: true })
   paid_at?: Date;
 
   @Column({
@@ -92,14 +93,14 @@ export class Order {
   address?: Address;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
-  items!: OrderItem[];
+  items?: OrderItem[];
 
   @OneToMany(() => OrderStatusHistory, (statusHistory) => statusHistory.order)
-  statusHistory!: OrderStatusHistory[];
+  statusHistory?: OrderStatusHistory[];
 
   @OneToMany(() => Delivery, (delivery) => delivery.order)
-  delivery!: Delivery[];
+  delivery?: Delivery[];
 
   @OneToMany(() => RatingReview, (ratingReview) => ratingReview.order)
-  ratingsReviews!: RatingReview[];
+  ratingsReviews?: RatingReview[];
 }
