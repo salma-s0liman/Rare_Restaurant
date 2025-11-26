@@ -7,9 +7,9 @@ import {
   generateEncryption,
   generateHash,
   userRoleEnum,
-} from "../../commen";
+} from "../../common";
 import type { Request, Response, NextFunction } from "express";
-import { emailEvent } from "../../commen/utils/email";
+import { emailEvent } from "../../common/utils/email";
 
 class AuthenticationService {
   constructor() {}

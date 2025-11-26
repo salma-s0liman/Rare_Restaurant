@@ -14,7 +14,7 @@ import rateLimit from "express-rate-limit";
 
 //import  module routing
 import authController from "./modules/auth/auth.controller";
-import { globalErrorHandling } from "./commen/utils/response/error.response";
+import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 
 //handle base rate limit on all api requests

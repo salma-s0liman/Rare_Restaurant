@@ -1,4 +1,4 @@
-import { genderEnum, userRoleEnum } from "../../commen";
+import { genderEnum, userRoleEnum } from "../../common";
 
 export interface ILoginBodyInputsDto {
   email: string;

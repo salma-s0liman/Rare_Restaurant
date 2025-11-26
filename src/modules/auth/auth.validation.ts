@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { genderEnum, userRoleEnum } from "../../commen";
+import { genderEnum, userRoleEnum } from "../../common";
 
 export const signupValidation = {
   body: z
