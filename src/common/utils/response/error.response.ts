@@ -2,15 +2,16 @@ import type { NextFunction, Request, Response } from "express";
 
 export interface IError extends Error {
   statusCode: number;
+  cause?: unknown;
 }
 
 export class ApplicationException extends Error {
   constructor(
     message: string,
     public statusCode: Number = 400,
-    cause?: unknown
+    public cause?: unknown
   ) {
-    super(message, { cause });
+    super(message);
     this.name = this.constructor.name;
     Error.captureStackTrace(this, this.constructor);
   }
