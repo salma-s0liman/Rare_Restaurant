@@ -8,7 +8,7 @@ import {
 
 import { Order, User } from "./index";
 
-import { orderStatusEnum, userRoleEnum } from "../../commen";
+import { orderStatusEnum, userRoleEnum } from "../../common";
 
 @Entity({ name: "order_status_history" })
 export class OrderStatusHistory {

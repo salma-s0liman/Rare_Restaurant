@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Restaurant } from "./restaurant";
 import { User } from "./user";
-import { restaurantAdminRoleEnum } from "../../commen/enums/restaurant.enum";
+import { restaurantAdminRoleEnum } from "../../common/enums/restaurant.enum";
 
 @Entity({ name: "restaurant_admins" })
 export class RestaurantAdmin {
