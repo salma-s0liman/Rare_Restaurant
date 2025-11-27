@@ -54,4 +54,9 @@ export abstract class BaseRepository<T extends Object>
     const result = await this.repo.delete(id);
     return result.affected !== 0;
   }
+
+  // 7. Save 
+  async save(entity: T): Promise<T> {
+    return await this.repo.save(entity);
+  }
 }

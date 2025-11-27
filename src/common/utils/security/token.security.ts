@@ -1,5 +1,7 @@
 import { userRepository } from "../../../modules/user/user.repository";
+import { tokenRepository } from "../../../modules/auth/token.repository";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 import {
   ApplicationException,
   IDecodeParams,
@@ -22,7 +24,12 @@ export const generateToken = async ({
   signature?: string;
   options?: jwt.SignOptions;
 }): Promise<string> => {
-  return jwt.sign(payload, signature, options);
+  // Add jti (JWT ID) to the payload for blacklisting
+  const tokenPayload = {
+    ...payload,
+    jti: uuidv4(), // Unique identifier for this token
+  };
+  return jwt.sign(tokenPayload, signature, options);
 };
 
 // 3. Verify Token
@@ -82,6 +89,19 @@ export const decodedToken = async ({
 
   try {
     const decoded = await verifyToken({ token, signature: signatureToUse });
+
+    // Check if token JTI is blacklisted (logged out)
+    if (decoded.jti) {
+      const isBlacklisted = await tokenRepository.isJtiBlacklisted(
+        decoded.jti
+      );
+      if (isBlacklisted) {
+        const error = new ApplicationException("Token has been revoked", 401);
+        if (next) return next(error);
+        throw error;
+      }
+    }
+
     const user = await userRepository.findById(decoded.id);
 
     if (!user) {

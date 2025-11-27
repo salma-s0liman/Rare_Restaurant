@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ILoginBodyInputsDto, ISignupBodyInputsDto } from "./auth.dto";
 import { userRepository } from "../user/user.repository";
+import { tokenRepository } from "./token.repository";
 import {
   ApplicationException,
   BadRequestException,
@@ -12,6 +13,7 @@ import {
   userRoleEnum,
   emailEvent,
   generateAuthTokens,
+  verifyToken,
 } from "../../common";
 
 class AuthenticationService {
@@ -110,6 +112,67 @@ class AuthenticationService {
         role: user.role,
       },
     });
+  };
+
+  logout = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response> => {
+    try {
+      const { authorization } = req.headers;
+
+      if (!authorization) {
+        throw new BadRequestException("Authorization header missing");
+      }
+
+      const [bearer, token] = authorization.split(" ");
+
+      if (!bearer || !token) {
+        throw new BadRequestException("Invalid token format");
+      }
+
+      // 1. Verify token is valid and get jti
+      const decoded = await verifyToken({
+        token,
+        signature: process.env.ACCESS_TOKEN_USER_SIGNATURE || "",
+      });
+
+      if (!decoded.jti) {
+        throw new BadRequestException("Token does not contain JTI");
+      }
+
+      // 2. Verify user exists
+      const user = await userRepository.findById(decoded.id);
+      if (!user) {
+        throw new BadRequestException("User not found");
+      }
+
+      const existing = await tokenRepository.findByJti(decoded.jti);
+      if (existing) {
+        return res.status(200).json({
+          message: "Already logged out",
+        });
+      }
+
+      await tokenRepository.create({
+        jti: decoded.jti,
+        createdBy: user.id,
+        expiredAt: new Date(decoded.exp! * 1000), // Convert Unix timestamp to Date
+      });
+
+      return res.status(200).json({
+        message: "Logged out successfully",
+      });
+    } catch (error: any) {
+      if (error.name === "TokenExpiredError") {
+        throw new BadRequestException("Token already expired");
+      }
+      if (error.name === "JsonWebTokenError") {
+        throw new BadRequestException("Invalid token");
+      }
+      throw error;
+    }
   };
 }
 

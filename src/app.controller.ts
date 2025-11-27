@@ -13,6 +13,11 @@ import rateLimit from "express-rate-limit";
 
 // Import module routing
 import authController from "./modules/auth/auth.controller";
+<<<<<<< HEAD
+import ratingController from "./modules/rating/rating.controller";
+=======
+import { menuController } from "./modules/menu";
+>>>>>>> 95173269426ce7c2dc9bea55d84d1d2eba4888f7
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 import { RestaurantModule } from "./modules/restaurant/restaurant.module";
@@ -61,6 +66,11 @@ const bootstrap = async (): Promise<void> => {
   // Module routing
   app.use("/restaurants", restaurantModule.router);
   app.use("/auth", authController);
+<<<<<<< HEAD
+  app.use("/rating", ratingController);
+=======
+  app.use("/api", menuController);
+>>>>>>> 95173269426ce7c2dc9bea55d84d1d2eba4888f7
 
   // Global error handling
   app.use(globalErrorHandling as unknown as (err: any, req: Request, res: Response, next: NextFunction) => void);

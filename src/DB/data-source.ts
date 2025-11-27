@@ -15,6 +15,7 @@ import {
   RatingReview,
   ReviewResponse,
   CartItem,
+  Token,
 } from "./entity/index";
 import dotenv from "dotenv";
 import { ENV } from "../config/env";
@@ -46,5 +47,6 @@ export const AppDataSource = new DataSource({
     RatingReview,
     ReviewResponse,
     CartItem,
+    Token,
   ],
 });
