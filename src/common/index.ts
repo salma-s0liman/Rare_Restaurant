@@ -2,3 +2,4 @@ export * from "./enums";
 export * from "./middleware";
 export * from "./utils";
 export * from "./interfaces";
+export * from "./repositories";

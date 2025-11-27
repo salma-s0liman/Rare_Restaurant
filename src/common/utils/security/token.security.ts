@@ -1,5 +1,3 @@
-import { userRepository } from "../../../modules/user/user.repository";
-import { tokenRepository } from "../../../modules/auth/token.repository";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -92,9 +90,11 @@ export const decodedToken = async ({
 
     // Check if token JTI is blacklisted (logged out)
     if (decoded.jti) {
-      const isBlacklisted = await tokenRepository.isJtiBlacklisted(
-        decoded.jti
+      // Lazy import to avoid circular dependency
+      const { tokenRepository } = await import(
+        "../../../modules/auth/token.repository"
       );
+      const isBlacklisted = await tokenRepository.isJtiBlacklisted(decoded.jti);
       if (isBlacklisted) {
         const error = new ApplicationException("Token has been revoked", 401);
         if (next) return next(error);
@@ -102,6 +102,10 @@ export const decodedToken = async ({
       }
     }
 
+    // Lazy import to avoid circular dependency
+    const { userRepository } = await import(
+      "../../../modules/user/user.repository"
+    );
     const user = await userRepository.findById(decoded.id);
 
     if (!user) {

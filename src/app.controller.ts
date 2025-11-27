@@ -13,6 +13,7 @@ import rateLimit from "express-rate-limit";
 
 // Import module routing
 import authController from "./modules/auth/auth.controller";
+import adminController from "./modules/admin/admin.controller";
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 
@@ -52,6 +53,7 @@ const bootstrap = async (): Promise<void> => {
 
   // Module routing
   app.use("/auth", authController);
+  app.use("/admin", adminController);
 
   // Global error handling
   app.use(

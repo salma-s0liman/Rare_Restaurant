@@ -1,4 +1,5 @@
-import { BaseRepository, Token } from "../../DB";
+import { BaseRepository } from "../../common";
+import { Token } from "../../DB";
 import { AppDataSource } from "../../DB/data-source";
 
 class TokenRepository extends BaseRepository<Token> {

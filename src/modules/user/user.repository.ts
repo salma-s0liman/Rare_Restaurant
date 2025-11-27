@@ -1,5 +1,6 @@
 import { AppDataSource } from "../../DB/data-source";
-import { User, BaseRepository } from "../../DB/";
+import { User } from "../../DB/";
+import { BaseRepository } from "../../common";
 
 class UserRepository extends BaseRepository<User> {
   constructor() {

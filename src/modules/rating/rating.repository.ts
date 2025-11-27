@@ -1,4 +1,5 @@
-import { BaseRepository, RatingReview, ReviewResponse } from "../../DB";
+import { BaseRepository } from "../../common";
+import { RatingReview, ReviewResponse } from "../../DB";
 import { AppDataSource } from "../../DB/data-source";
 
 // 1. Rating Repository

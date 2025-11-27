@@ -1,16 +1,5 @@
 import { Response } from "express";
-
-export interface ISuccessResponse<T = any> {
-  success: boolean;
-  message: string;
-  data?: T;
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+import { ISuccessResponse } from "../../interfaces/response.interface";
 
 export const successResponse = <T = any>(
   res: Response,
@@ -32,17 +21,3 @@ export const successResponse = <T = any>(
   return res.status(statusCode).json(response);
 };
 
-export const errorResponse = (
-  res: Response,
-  message: string = "Something went wrong",
-  statusCode: number = 500,
-  errors?: any
-): Response => {
-  const response = {
-    success: false,
-    message,
-    errors,
-  };
-
-  return res.status(statusCode).json(response);
-};

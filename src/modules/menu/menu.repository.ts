@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
 import { AppDataSource } from "../../DB/data-source";
 import { Restaurant, Category, MenuItem, MenuItemImage } from "../../DB/entity";
-import { BaseRepository } from "../../DB/repositories/BaseRepository";
+import { BaseRepository } from "../../common";
 import {
   MenuQueryDto,
   RestaurantQueryDto,
