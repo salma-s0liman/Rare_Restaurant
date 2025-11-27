@@ -1,7 +1,7 @@
 // Setup ENV
 import { resolve } from "node:path";
 import { config } from "dotenv";
-config({ path: resolve("./config/.env") }); // load your generated .env
+config({ path: resolve(".env") }); // load your generated .env
 
 // Load express
 import express, { Express, Request, Response, NextFunction } from "express";
@@ -13,11 +13,6 @@ import rateLimit from "express-rate-limit";
 
 // Import module routing
 import authController from "./modules/auth/auth.controller";
-<<<<<<< HEAD
-import ratingController from "./modules/rating/rating.controller";
-=======
-import { menuController } from "./modules/menu";
->>>>>>> 95173269426ce7c2dc9bea55d84d1d2eba4888f7
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 
@@ -45,10 +40,6 @@ const bootstrap = async (): Promise<void> => {
   try {
     await AppDataSource.initialize();
     console.log("Database connected successfully");
-
-    // Optional: quick test query
-    const test = await AppDataSource.manager.query("SELECT NOW() AS `current_timestamp`");
-    console.log("DB test query result:", test);
   } catch (err: any) {
     console.error("Database connection failed:", err.message);
     process.exit(1); // Stop the app if DB fails
@@ -61,14 +52,16 @@ const bootstrap = async (): Promise<void> => {
 
   // Module routing
   app.use("/auth", authController);
-<<<<<<< HEAD
-  app.use("/rating", ratingController);
-=======
-  app.use("/api", menuController);
->>>>>>> 95173269426ce7c2dc9bea55d84d1d2eba4888f7
 
   // Global error handling
-  app.use(globalErrorHandling as unknown as (err: any, req: Request, res: Response, next: NextFunction) => void);
+  app.use(
+    globalErrorHandling as unknown as (
+      err: any,
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => void
+  );
 
   // Start server
   app.listen(port, () => {
