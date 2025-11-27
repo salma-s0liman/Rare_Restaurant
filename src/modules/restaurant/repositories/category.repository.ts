@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
-import { BaseRepository } from "../../../DB/repositories/BaseRepository";
 import { Category } from "../../../DB/entity/category";
+import { BaseRepository } from "../../../common";
 
 export class CategoryRepository extends BaseRepository<Category> {
   constructor(repo: Repository<Category>) {

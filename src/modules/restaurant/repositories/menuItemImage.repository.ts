@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
-import { BaseRepository } from "../../../DB/repositories/BaseRepository";
 import { MenuItemImage } from "../../../DB/entity/menuItemImage";
+import { BaseRepository } from "../../../common";
 
 export class MenuItemImageRepository extends BaseRepository<MenuItemImage> {
   constructor(repo: Repository<MenuItemImage>) {
