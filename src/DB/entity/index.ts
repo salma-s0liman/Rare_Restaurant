@@ -1,5 +1,4 @@
-
-export * from "./address";  
+export * from "./address";
 export * from "./restaurant";
 export * from "./user";
 export * from "./category";
@@ -14,3 +13,4 @@ export * from "./delivery";
 export * from "./ratingReview";
 export * from "./reviewResponse";
 export * from "./cartItems";
+export * from "./token";

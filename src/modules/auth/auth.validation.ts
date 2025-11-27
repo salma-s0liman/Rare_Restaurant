@@ -75,3 +75,13 @@ export const loginValidation = {
     password: z.string().min(8),
   }),
 };
+
+export const logoutValidation = {
+  headers: z
+    .object({
+      authorization: z.string().regex(/^Bearer .+$/, {
+        message: "Authorization header must be in format: Bearer <token>",
+      }),
+    })
+    .passthrough(), // Allow other headers
+};

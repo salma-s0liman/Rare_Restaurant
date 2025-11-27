@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as validators from "./auth.validation";
 import authService from "./auth.service";
-import { validation } from "../../common/";
+import { auth, validation } from "../../common/";
 const router: Router = Router();
 
 router.post(
@@ -14,6 +14,13 @@ router.post(
   "/login",
   validation(validators.loginValidation),
   authService.login
+);
+
+router.post(
+  "/logout",
+  validation(validators.logoutValidation),
+  auth(), // Requires authentication
+  authService.logout
 );
 
 export default router;

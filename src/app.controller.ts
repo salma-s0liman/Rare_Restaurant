@@ -14,6 +14,7 @@ import rateLimit from "express-rate-limit";
 
 //import  module routing
 import authController from "./modules/auth/auth.controller";
+import ratingController from "./modules/rating/rating.controller";
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 
@@ -50,6 +51,7 @@ const bootstrap = (): void => {
 
   // sub-app-routing-modules
   app.use("/auth", authController);
+  app.use("/rating", ratingController);
 
   //In-valid routing
   app.use("{/*dumy}", (req: Request, res: Response) => {

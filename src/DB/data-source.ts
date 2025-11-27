@@ -15,6 +15,7 @@ import {
   RatingReview,
   ReviewResponse,
   CartItem,
+  Token,
 } from "./entity/index";
 
 export const AppDataSource = new DataSource({
@@ -42,5 +43,6 @@ export const AppDataSource = new DataSource({
     RatingReview,
     ReviewResponse,
     CartItem,
+    Token,
   ],
 });
