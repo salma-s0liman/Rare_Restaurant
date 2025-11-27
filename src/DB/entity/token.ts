@@ -24,6 +24,6 @@ export class Token {
   @JoinColumn({ name: "createdBy" })
   user!: User;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", nullable: true })
   createdAt!: Date;
 }
