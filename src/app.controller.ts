@@ -1,67 +1,76 @@
-//Setup ENV
+// Setup ENV
 import { resolve } from "node:path";
 import { config } from "dotenv";
-config({ path: resolve("./config/.env.development") });
+config({ path: resolve("./config/.env") }); // load your generated .env
 
-//Load express
-import type { Express, Request, Response } from "express";
-import express from "express";
+// Load express
+import express, { Express, Request, Response, NextFunction } from "express";
 
-//Third party middleware
+// Third-party middleware
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
-//import  module routing
+// Import module routing
 import authController from "./modules/auth/auth.controller";
+<<<<<<< HEAD
 import ratingController from "./modules/rating/rating.controller";
+=======
+import { menuController } from "./modules/menu";
+>>>>>>> 95173269426ce7c2dc9bea55d84d1d2eba4888f7
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 
-//handle base rate limit on all api requests
-const limitter = rateLimit({
-  windowMs: 60 * 60000,
-  limit: 2000,
-  message: { error: "Too many request please try again" },
-  statusCode: 429,
+// Rate limiter
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 2000,
+  message: { error: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-//app-start-point
-const bootstrap = (): void => {
-  const port: number | String = process.env.PORT || 5000;
+// Bootstrap function
+const bootstrap = async (): Promise<void> => {
+  const port: number = Number(process.env.PORT) || 3000;
   const app: Express = express();
 
-  //global application middleware
-  app.use(express.json(), helmet(), cors(), limitter);
+  // Global middleware
+  app.use(express.json());
+  app.use(helmet());
+  app.use(cors());
+  app.use(limiter);
 
-  // database connection
-  AppDataSource.initialize()
-    .then(() => {
-      console.log("Database connected successfully");
-    })
-    .catch((error) => {
-      console.log("Database connection failed");
-      console.error(error);
-    });
+  // Test database connection before starting server
+  try {
+    await AppDataSource.initialize();
+    console.log("Database connected successfully");
 
-  // app-routing
+    // Optional: quick test query
+    const test = await AppDataSource.manager.query("SELECT NOW() AS `current_timestamp`");
+    console.log("DB test query result:", test);
+  } catch (err: any) {
+    console.error("Database connection failed:", err.message);
+    process.exit(1); // Stop the app if DB fails
+  }
+
+  // Base route
   app.get("/", (req: Request, res: Response) => {
-    res.json({ message: `hello to my ${process.env.APPLICATION_NAME}` });
+    res.json({ message: `Hello from ${process.env.APPLICATION_NAME}` });
   });
 
-  // sub-app-routing-modules
+  // Module routing
   app.use("/auth", authController);
+<<<<<<< HEAD
   app.use("/rating", ratingController);
+=======
+  app.use("/api", menuController);
+>>>>>>> 95173269426ce7c2dc9bea55d84d1d2eba4888f7
 
-  //In-valid routing
-  app.use("{/*dumy}", (req: Request, res: Response) => {
-    return res.status(404).json({ message: "Invalid application routing" });
-  });
+  // Global error handling
+  app.use(globalErrorHandling as unknown as (err: any, req: Request, res: Response, next: NextFunction) => void);
 
-  //global-error-handling
-  app.use(globalErrorHandling);
-
-  //Start Server
+  // Start server
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });

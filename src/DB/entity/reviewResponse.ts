@@ -23,8 +23,8 @@ export class ReviewResponse {
   @Column({ type: "text" })
   response_text!: string;
 
-  @CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
-  created_at!: Date;
+  @CreateDateColumn({type: "timestamp", nullable: true})
+  created_at?: Date;
 
   // ------------- Relations --------------
 

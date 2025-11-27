@@ -22,8 +22,8 @@ export class MenuItemImage {
   @Column({ type: "boolean", default: false })
   is_primary: boolean = false;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  created_at!: Date;
+  @CreateDateColumn({ type: "timestamp", nullable: true })
+  created_at?: Date;
 
   // Relation to MenuItem
   @ManyToOne(() => MenuItem, (menuItem) => menuItem.images, {

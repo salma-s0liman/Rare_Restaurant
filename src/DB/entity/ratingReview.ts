@@ -36,8 +36,8 @@ export class RatingReview {
   @Column({ type: "boolean", default: true })
   is_visible!: boolean;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  created_at!: Date;
+  @CreateDateColumn({ type: "timestamp", nullable: true })
+  created_at?: Date; 
 
   @ManyToOne(() => User, (user) => user.ratingsReviews, {
     onDelete: "CASCADE",

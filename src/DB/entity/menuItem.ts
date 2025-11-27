@@ -33,7 +33,7 @@ export class MenuItem {
   @Column({ type: "boolean", default: true })
   is_available: boolean = true;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ type: "timestamp", nullable: true })
   created_at?: Date;
 
   // Relation to Restaurant
