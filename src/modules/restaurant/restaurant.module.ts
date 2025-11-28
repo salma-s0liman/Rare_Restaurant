@@ -42,8 +42,8 @@ export class RestaurantModule {
       categoryRepo,
     );
 
-    const categoryService = new CategoryService(categoryRepo);
-    const menuItemService = new MenuItemService(menuItemRepo, imageRepo);
+    const categoryService = new CategoryService(categoryRepo, restaurantRepo);
+    const menuItemService = new MenuItemService(menuItemRepo, imageRepo, restaurantRepo, categoryRepo);
 
     // CONTROLLERS
     const restaurantController = new RestaurantController(restaurantService);
