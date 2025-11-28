@@ -14,9 +14,12 @@ import rateLimit from "express-rate-limit";
 // Import module routing
 import authController from "./modules/auth/auth.controller";
 import adminController from "./modules/admin/admin.controller";
+import ordersController from "./modules/orders/orders.controller";
+import cartController from "./modules/cart/cart.controller";
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 import { RestaurantModule } from "./modules/restaurant/restaurant.module";
+
 
 // Rate limiter
 const limiter = rateLimit({
@@ -37,11 +40,11 @@ const bootstrap = async (): Promise<void> => {
   app.use(helmet());
   app.use(cors());
   app.use(limiter);
-
+  
   // Test database connection before starting server
   try {
     await AppDataSource.initialize();
-    console.log("Database connected successfully");
+    console.log("Database connected successfully");    
   } catch (err: any) {
     console.error("Database connection failed:", err.message);
     process.exit(1); // Stop the app if DB fails
@@ -59,6 +62,9 @@ const bootstrap = async (): Promise<void> => {
   app.use("/restaurants", restaurantModule.router);
   app.use("/auth", authController);
   app.use("/admin", adminController);
+  app.use("/orders", ordersController);
+
+
 
 
   // Global error handling
