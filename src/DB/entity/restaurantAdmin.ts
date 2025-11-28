@@ -16,7 +16,7 @@ export class RestaurantAdmin {
   @PrimaryGeneratedColumn("uuid")
   id: string = uuidv4().toString();
 
-  @Column({ type: "enum", enum: restaurantAdminRoleEnum, default: restaurantAdminRoleEnum.owner })
+  @Column({ type: "enum", enum: restaurantAdminRoleEnum, default: restaurantAdminRoleEnum.staff })
   role!: restaurantAdminRoleEnum;
 
   @CreateDateColumn({type: "timestamp", nullable: true})

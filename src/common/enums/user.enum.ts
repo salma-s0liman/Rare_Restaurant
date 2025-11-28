@@ -1,14 +1,15 @@
-
-
-export enum genderEnum { 
-    male = "male",  
-    female = "female",
-    other = "other"
+export enum genderEnum {
+  male = "male",
+  female = "female",
+  other = "other",
 }
 
 export enum userRoleEnum {
   customer = "customer",
+  admin = "admin",
+  manager = "manager",
+  staff = "staff",
   system = "system",
   delivery = "delivery",
-  restaurant_admin = "restaurant_admin"
+  owner = "owner",
 }

@@ -33,21 +33,20 @@ export class Restaurant {
   is_active: boolean = true;
 
   @CreateDateColumn({ type: "timestamp", nullable: true })
-    created_at?: Date;
-    
-    @OneToMany(() => Category, (category) => category.restaurant)
-    categories?: Category[];
+  created_at?: Date;
 
-    @OneToMany(() => MenuItem, (menuItem) => menuItem.restaurant)
-    menu_items?: MenuItem[];
-     
-    @OneToMany(() => Cart, (cart) => cart.restaurant)
-    carts?: Cart[];
+  @OneToMany(() => Category, (category) => category.restaurant)
+  categories?: Category[];
 
-    @OneToMany(() => RestaurantAdmin, (admin) => admin.restaurant)
-    admins?: RestaurantAdmin[];
+  @OneToMany(() => MenuItem, (menuItem) => menuItem.restaurant)
+  menu_items?: MenuItem[];
 
-    @OneToMany(() => Order, (order) => order.restaurant)
-    orders?: Order[];
+  @OneToMany(() => Cart, (cart) => cart.restaurant)
+  carts?: Cart[];
+
+  @OneToMany(() => RestaurantAdmin, (admin) => admin.restaurant)
+  admins?: RestaurantAdmin[];
+
+  @OneToMany(() => Order, (order) => order.restaurant)
+  orders?: Order[];
 }
-

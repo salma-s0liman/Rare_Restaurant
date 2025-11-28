@@ -2,21 +2,34 @@ import { Router } from "express";
 import { RestaurantController } from "../controllers/restaurant.controller";
 import { CategoryController } from "../controllers/category.controller";
 import { MenuItemController } from "../controllers/menuItem.controller";
+import { auth } from "../../../common";
+import { userRoleEnum } from "../../../common/enums";
 
 export const restaurantRoutes = (
   restaurantController: RestaurantController,
   categoryController: CategoryController,
   menuItemController: MenuItemController
 ) => {
-
   const router = Router();
 
   // RESTAURANTS
-  router.post("/", restaurantController.createRestaurant);
+  router.post(
+    "/",
+    auth([]),
+    restaurantController.createRestaurant
+  );
   router.get("/", restaurantController.getAllRestaurants);
   router.get("/:id", restaurantController.getRestaurantById);
-  router.put("/:id", restaurantController.updateRestaurant);
-  router.delete("/:id", restaurantController.deleteRestaurant);
+  router.put(
+    "/:id",
+    auth([userRoleEnum.owner]),
+    restaurantController.updateRestaurant
+  );
+  router.delete(
+    "/:id",
+    auth([userRoleEnum.owner]),
+    restaurantController.deleteRestaurant
+  );
 
   // CATEGORIES
   router.post("/:restaurantId/categories", categoryController.createCategory);

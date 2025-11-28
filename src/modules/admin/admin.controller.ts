@@ -1,14 +1,14 @@
 import { Router } from "express";
-import * as validators from "./admin.validation";
 import adminService from "./admin.service";
-import { auth, validation } from "../../common/";
-import { userRoleEnum } from "../../common/enums";
+import { auth, validation, userRoleEnum } from "../../common";
+import * as validators from "./admin.validation";
+
 const router: Router = Router();
 
-// Get restaurant orders with filters
+// Get restaurant orders
 router.get(
   "/restaurants/:restaurantId/orders",
-  auth([userRoleEnum.restaurant_admin]),
+  auth([userRoleEnum.owner, userRoleEnum.admin, userRoleEnum.manager]),
   validation(validators.getRestaurantOrdersValidation),
   adminService.getRestaurantOrders
 );
@@ -16,33 +16,33 @@ router.get(
 // Get order detail
 router.get(
   "/orders/:orderId",
-  auth([userRoleEnum.restaurant_admin]),
+  auth([userRoleEnum.owner, userRoleEnum.admin, userRoleEnum.manager]),
   validation(validators.getOrderDetailValidation),
- // adminService.getOrderDetail
+  adminService.getOrderDetail
 );
 
 // Update order status
 router.patch(
   "/orders/:orderId/status",
-  auth([userRoleEnum.restaurant_admin]),
+  auth([userRoleEnum.owner, userRoleEnum.admin, userRoleEnum.manager]),
   validation(validators.updateOrderStatusValidation),
- // adminService.updateOrderStatus
+  adminService.updateOrderStatus
 );
 
-// Assign delivery to order
+// Assign delivery
 router.post(
   "/orders/:orderId/assign-delivery",
-  auth([userRoleEnum.restaurant_admin]),
+  auth([userRoleEnum.owner, userRoleEnum.admin, userRoleEnum.manager]),
   validation(validators.assignDeliveryValidation),
- // adminService.assignDelivery
+  adminService.assignDelivery
 );
 
-// Get restaurant dashboard
-router.get(
-  "/restaurants/:restaurantId/dashboard",
-  auth([userRoleEnum.restaurant_admin]),
-  validation(validators.getDashboardValidation),
- // adminService.getDashboard
+// Assign role (owners only)
+router.post(
+  "/restaurants/:restaurantId/assign-role",
+  auth([userRoleEnum.owner]),
+  validation(validators.assignRoleValidation),
+  adminService.assignRoleToRestaurant
 );
 
 export default router;

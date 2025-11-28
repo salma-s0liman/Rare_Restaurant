@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { auth, userRoleEnum, validation } from "../../common";
-import  ratingService  from "./rating.service";
+import ratingService from "./rating.service";
 import {
   adminResponseValidation,
   createRatingValidation,
@@ -38,7 +38,7 @@ router.get(
 // 4. Admin Response
 router.post(
   "/admin/ratings/:ratingId/response",
-  auth([userRoleEnum.restaurant_admin]),
+  auth(),
   validation(adminResponseValidation),
   ratingService.respondToReview
 );

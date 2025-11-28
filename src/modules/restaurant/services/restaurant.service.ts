@@ -1,15 +1,42 @@
 import { RestaurantRepository } from "../repositories/restaurant.repository";
 import { CategoryRepository } from "../repositories/category.repository";
-import { CreateRestaurantDto, UpdateRestaurantDto } from "../dtos/restaurant.dto";
+import {
+  CreateRestaurantDto,
+  UpdateRestaurantDto,
+} from "../dtos/restaurant.dto";
+import { AppDataSource } from "../../../DB/data-source";
+import { RestaurantAdmin } from "../../../DB";
+import { restaurantAdminRoleEnum, userRoleEnum } from "../../../common/enums";
+import { userRepository } from "../../user/user.repository";
 
 export class RestaurantService {
   constructor(
     private restaurantRepo: RestaurantRepository,
-    private categoryRepo: CategoryRepository,
+    private categoryRepo: CategoryRepository
   ) {}
 
-  async createRestaurant(data: CreateRestaurantDto) {
-    return await this.restaurantRepo.create(data);
+  async createRestaurant(data: CreateRestaurantDto, ownerId: string) {
+    // Create restaurant
+    const restaurant = await this.restaurantRepo.create(data);
+
+    // Auto-assign creator as owner in RestaurantAdmin table
+    const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
+    const restaurantAdmin = adminRepo.create({
+      user: { id: ownerId } as any,
+      restaurant: { id: restaurant.id } as any,
+      role: restaurantAdminRoleEnum.owner,
+    });
+
+    await adminRepo.save(restaurantAdmin);
+
+    // Update user's system role to owner
+    const user = await userRepository.findById(ownerId);
+    if (user && user.role !== userRoleEnum.owner) {
+      user.role = userRoleEnum.owner;
+      await userRepository.save(user);
+    }
+
+    return restaurant;
   }
 
   async getAllRestaurants() {
@@ -20,7 +47,7 @@ export class RestaurantService {
     return await this.restaurantRepo.findById(id, [
       "admins",
       "categories",
-      "menuItems",
+      "menu_items",
     ]);
   }
 

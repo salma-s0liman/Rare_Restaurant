@@ -93,11 +93,9 @@ class AuthenticationService {
 
     // 5. Generate Token
     const token = await generateAuthTokens({
-      payload: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
+      id: user.id,
+      email: user.email,
+      role: user.role,
     });
 
     return res.status(200).json({

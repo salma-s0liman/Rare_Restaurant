@@ -5,7 +5,18 @@ export class RestaurantController {
   constructor(private restaurantService: RestaurantService) {}
 
   createRestaurant = async (req: Request, res: Response) => {
-    const result = await this.restaurantService.createRestaurant(req.body);
+    // DEBUG: Log who is creating the restaurant
+    console.log("🏪 Creating restaurant - User info:", {
+      id: req.user!.id,
+      email: req.user!.email,
+      firstName: req.user!.firstName,
+      lastName: req.user!.lastName,
+    });
+
+    const result = await this.restaurantService.createRestaurant(
+      req.body,
+      req.user!.id
+    );
     res.json(result);
   };
 
@@ -14,7 +25,7 @@ export class RestaurantController {
     res.json(result);
   };
 
-  getRestaurantById = async (req: Request, res: Response) : Promise<any> => {
+  getRestaurantById = async (req: Request, res: Response): Promise<any> => {
     const id = req.params.id;
 
     if (!id) {
@@ -25,7 +36,7 @@ export class RestaurantController {
     res.json(result);
   };
 
-  updateRestaurant = async (req: Request, res: Response) : Promise<any> => {
+  updateRestaurant = async (req: Request, res: Response): Promise<any> => {
     const id = req.params.id;
 
     if (!id) {
@@ -36,7 +47,7 @@ export class RestaurantController {
     res.json(result);
   };
 
-  deleteRestaurant = async (req: Request, res: Response) : Promise<any> => {
+  deleteRestaurant = async (req: Request, res: Response): Promise<any> => {
     const id = req.params.id;
 
     if (!id) {

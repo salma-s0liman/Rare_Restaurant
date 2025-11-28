@@ -1,4 +1,10 @@
-import { IsString, IsOptional, Length, IsBoolean } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  Length,
+  IsBoolean,
+  IsPhoneNumber,
+} from "class-validator";
 
 export class CreateRestaurantDto {
   @IsString()
@@ -8,6 +14,7 @@ export class CreateRestaurantDto {
   @IsOptional()
   @IsString()
   @Length(0, 30)
+  @IsPhoneNumber()
   phone?: string;
 
   @IsOptional()

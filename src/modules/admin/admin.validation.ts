@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { orderStatusEnum } from "../../common";
+import { orderStatusEnum, restaurantAdminRoleEnum } from "../../common/enums";
 
 // GET /api/admin/restaurants/:restaurantId/orders
 export const getRestaurantOrdersValidation = {
   params: z.object({
-    restaurantId: z.string().uuid({ message: "Invalid restaurant ID" }),
+    restaurantId: z.uuid({ message: "Invalid restaurant ID" }),
   }),
   query: z.object({
     status: z
@@ -47,9 +47,17 @@ export const assignDeliveryValidation = {
   }),
 };
 
-// GET /api/admin/restaurants/:restaurantId/dashboard
-export const getDashboardValidation = {
+// POST /api/admin/restaurants/:restaurantId/assign-role
+export const assignRoleValidation = {
   params: z.object({
-    restaurantId: z.uuid({ message: "Invalid restaurant ID" }),
+    restaurantId: z.string().uuid({ message: "Invalid restaurant ID" }),
+  }),
+  body: z.object({
+    userId: z.string().uuid({ message: "Invalid user ID" }),
+    role: z
+      .enum(restaurantAdminRoleEnum, {
+        message: "Role must be owner, admin, manager, or staff",
+      })
+      .default(restaurantAdminRoleEnum.staff),
   }),
 };

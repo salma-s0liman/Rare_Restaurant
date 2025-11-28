@@ -1,5 +1,12 @@
 import { genderEnum, userRoleEnum } from "../../common";
-import { Address, Cart, RestaurantAdmin, Order, RatingReview, ReviewResponse } from "./index";
+import {
+  Address,
+  Cart,
+  RestaurantAdmin,
+  Order,
+  RatingReview,
+  ReviewResponse,
+} from "./index";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -13,7 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 export class User {
   @PrimaryGeneratedColumn("uuid", { name: "id" })
   id: string = uuidv4().toString();
-  
+
   @Column({ type: "varchar", length: 100 })
   firstName!: string;
 
@@ -43,7 +50,7 @@ export class User {
   @Column()
   password!: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt?: Date;
 
   @Column({ type: "timestamp", nullable: true })
@@ -73,5 +80,3 @@ export class User {
   @OneToMany(() => ReviewResponse, (reviewResponse) => reviewResponse.responder)
   reviewResponses?: ReviewResponse[];
 }
-
-

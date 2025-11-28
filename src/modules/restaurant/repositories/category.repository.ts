@@ -10,7 +10,7 @@ export class CategoryRepository extends BaseRepository<Category> {
   async findByRestaurant(restaurantId: string) {
     return this.repo.find({
       where: { restaurant: { id: restaurantId } },
-      relations: ["menuItems"],
+      relations: ["menu_items"],
     });
   }
 }

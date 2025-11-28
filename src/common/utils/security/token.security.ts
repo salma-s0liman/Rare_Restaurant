@@ -4,7 +4,6 @@ import {
   ApplicationException,
   IDecodeParams,
   ITokenPayload,
-  signatureTypeEnum,
   tokenTypeEnum,
 } from "../..";
 import { User } from "../../../DB";
@@ -22,10 +21,9 @@ export const generateToken = async ({
   signature?: string;
   options?: jwt.SignOptions;
 }): Promise<string> => {
-  // Add jti (JWT ID) to the payload for blacklisting
   const tokenPayload = {
     ...payload,
-    jti: uuidv4(), // Unique identifier for this token
+    jti: uuidv4(),
   };
   return jwt.sign(tokenPayload, signature, options);
 };
@@ -33,7 +31,7 @@ export const generateToken = async ({
 // 3. Verify Token
 export const verifyToken = async ({
   token = "",
-  signature = process.env.ACCESS_TOKEN_SYSTEM_SIGNATURE || "default_secret",
+  signature = process.env.ACCESS_TOKEN_USER_SIGNATURE || "salomaaaa",
 }: {
   token: string;
   signature?: string;
@@ -42,7 +40,7 @@ export const verifyToken = async ({
 };
 
 // 4. Get Signature Logic
-export const getSignature = (signatureLevel: string) => {
+export const getSignature = () => {
   const signatures = {
     accessSignature:
       process.env.ACCESS_TOKEN_USER_SIGNATURE || "default_access_secret",
@@ -50,12 +48,12 @@ export const getSignature = (signatureLevel: string) => {
       process.env.REFRESH_TOKEN_USER_SIGNATURE || "default_refresh_secret",
   };
 
-  if (signatureLevel === signatureTypeEnum.System) {
-    signatures.accessSignature =
-      process.env.ACCESS_TOKEN_SYSTEM_SIGNATURE || "default_sys_access";
-    signatures.refreshSignature =
-      process.env.REFRESH_TOKEN_SYSTEM_SIGNATURE || "default_sys_refresh";
-  }
+  //if (signatureLevel === signatureTypeEnum.System) {
+  // signatures.accessSignature =
+  //  process.env.ACCESS_TOKEN_SYSTEM_SIGNATURE || "default_sys_access";
+  // signatures.refreshSignature =
+  //  process.env.REFRESH_TOKEN_SYSTEM_SIGNATURE || "default_sys_refresh";
+  //}
 
   return signatures;
 };
@@ -67,9 +65,9 @@ export const decodedToken = async ({
   tokenType = tokenTypeEnum.Access,
   next,
 }: IDecodeParams): Promise<User | void> => {
-  const [bearer, token] = authorization?.split(" ") || [];
+  const token = authorization;
 
-  if (!bearer || !token) {
+  if (!token) {
     const error = new ApplicationException(
       "Token is missing or invalid format",
       401
@@ -79,7 +77,7 @@ export const decodedToken = async ({
   }
 
   // C. Get Correct Signature (System vs Bearer)
-  const signatures = getSignature(bearer);
+  const signatures = getSignature();
   const signatureToUse =
     tokenType === tokenTypeEnum.Access
       ? signatures.accessSignature
@@ -88,9 +86,10 @@ export const decodedToken = async ({
   try {
     const decoded = await verifyToken({ token, signature: signatureToUse });
 
-    // Check if token JTI is blacklisted (logged out)
+    // DEBUG: Log the decoded token structure
+    console.log("🔍 Raw decoded token:", decoded);
+
     if (decoded.jti) {
-      // Lazy import to avoid circular dependency
       const { tokenRepository } = await import(
         "../../../modules/auth/token.repository"
       );
@@ -117,9 +116,20 @@ export const decodedToken = async ({
       throw error;
     }
 
+    // DEBUG: Log token decoding results
+    console.log("🔐 Token decoded - User found:", {
+      tokenUserId: decoded.id,
+      tokenEmail: decoded.email,
+      foundUser: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    });
+
     return user;
   } catch (error: any) {
-    // Handle JWT specific errors
     const message =
       error.name === "TokenExpiredError" ? "Token expired" : "Invalid Token";
     const appError = new ApplicationException(message, 401);
@@ -130,10 +140,10 @@ export const decodedToken = async ({
 };
 
 export const generateAuthTokens = async (
-  payload: any,
-  roleLevel: string = "Bearer"
+  payload: any
+  //roleLevel: string = "Bearer"
 ): Promise<{ accessToken: string; refreshToken: string } | void> => {
-  const signatures = getSignature(roleLevel);
+  const signatures = getSignature();
 
   // 2. Generate Access Token
   const accessToken = await generateToken({

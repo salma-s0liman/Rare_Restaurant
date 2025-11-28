@@ -12,5 +12,5 @@ export interface ITokenPayload extends JwtPayload {
   id: string;
   email: string;
   role: string;
-  jti?: string; // JWT ID for token revocation
+  jti?: string; 
 }

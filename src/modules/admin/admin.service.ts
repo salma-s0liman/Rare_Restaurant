@@ -1,356 +1,275 @@
 import type { Request, Response, NextFunction } from "express";
-import { adminRepository } from "./admin.repository";
-import { userRepository } from "../user/user.repository";
+import { AppDataSource } from "../../DB/data-source";
+import { RestaurantAdmin, Order, User, Delivery } from "../../DB/entity";
 import {
   BadRequestException,
   NotfoundException,
- // ApplicationException,
- // orderStatusEnum,
   userRoleEnum,
-} from "../../common/";
-import {
-  GetRestaurantOrdersDto,
- // UpdateOrderStatusDto,
- // AssignDeliveryDto,
-} from "./admin.dto";
+} from "../../common";
 
 class AdminService {
-  // Helper: Verify admin has access to restaurant
-  private async verifyRestaurantAccess(
-    restaurantId: string,
-    adminUserId: string
-  ) {
-    const admin = await userRepository.findOne({
-      where: { id: adminUserId },
-      relations: ["adminRoles", "adminRoles.restaurant"],
+  private async checkRestaurantAccess(restaurantId: string, userId: string) {
+    const access = await AppDataSource.getRepository(RestaurantAdmin).findOne({
+      where: {
+        user: { id: userId },
+        restaurant: { id: restaurantId },
+      },
     });
 
-    if (!admin) {
-      throw new NotfoundException("Admin user not found");
+    if (!access) {
+      throw new BadRequestException("You don't have access to this restaurant");
     }
-
-    if (admin.role !== userRoleEnum.restaurant_admin) {
-      throw new BadRequestException("User is not a restaurant admin");
-    }
-
-    // Check if admin manages this restaurant via RestaurantAdmin relation
-    const hasAccess = admin.adminRoles?.some(
-      (role) => role.restaurant.id === restaurantId
-    );
-
-    if (!hasAccess) {
-      throw new BadRequestException(
-        "You do not have access to this restaurant"
-      );
-    }
+    return access;
   }
-  // Get restaurant orders with filters
+
+  // GET /api/admin/restaurants/:restaurantId/orders
   getRestaurantOrders = async (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response> => {
-    const restaurantId = req.params.restaurantId!;
-    const { status, page, limit } = req.query;
+  ) => {
+    try {
+      const { restaurantId } = req.params;
 
-    // Verify admin has access to this restaurant
-    await this.verifyRestaurantAccess(restaurantId, req.user!.id);
+      if (!restaurantId)
+        throw new BadRequestException("Restaurant ID required");
 
-    const filters: GetRestaurantOrdersDto = {
-      status: status as any,
-      page: page ? Number(page) : 1,
-      limit: limit ? Number(limit) : 20,
-    };
+      // Debug: Log user info
+      console.log("Admin access attempt - User:", {
+        id: req.user!.id,
+        role: req.user!.role,
+        email: req.user!.email,
+      });
 
-    const { orders, total } = await adminRepository.findRestaurantOrders(
-      restaurantId,
-      filters.status,
-      filters.page,
-      filters.limit
-    );
+      await this.checkRestaurantAccess(restaurantId, req.user!.id);
 
-    const result = {
-      orders: orders.map((order) => ({
+      const orderRepo = AppDataSource.getRepository(Order);
+      const orders = await orderRepo.find({
+        where: { restaurant: { id: restaurantId } },
+        relations: ["user", "items"],
+        order: { placed_at: "DESC" },
+      });
+
+      const result = orders.map((order) => ({
         id: order.id,
         orderNumber: order.order_number,
         status: order.status,
         totalAmount: Number(order.total_amount),
-        placedAt: order.placed_at!,
-        paymentStatus: order.payment_status,
-        customer: {
-          id: order.user.id,
-          name: `${order.user.firstName} ${order.user.lastName}`,
-        },
+        placedAt: order.placed_at,
+        customer: `${order.user.firstName} ${order.user.lastName}`,
         itemCount: order.items?.length || 0,
-        deliveryAssigned: !!order.delivery,
-      })),
-      pagination: {
-        page: filters.page,
-        limit: filters.limit,
-        total,
-        totalPages: Math.ceil(total / (filters.limit || 20)),
-      },
-    };
+      }));
 
-    return res.status(200).json({
-      message: "Orders retrieved successfully",
-      data: result,
-    });
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
   };
 
-  // Get detailed order information
-  // getOrderDetail = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<Response> => {
-  //   const orderId = req.params.orderId!;
-  //   const order = await adminRepository.findOrderDetail(orderId);
+  // GET /api/admin/orders/:orderId
+  getOrderDetail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { orderId } = req.params;
 
-  //   if (!order) {
-  //     throw new NotfoundException("Order not found");
-  //   }
+      const order = await AppDataSource.getRepository(Order).findOne({
+        where: { id: orderId },
+        relations: ["user", "items", "address", "restaurant"],
+      });
 
-  //   // Verify admin has access to this order's restaurant
-  //   await this.verifyRestaurantAccess(order.restaurant.id, req.user!.id);
+      if (!order) {
+        throw new NotfoundException("Order not found");
+      }
 
-  //   const result = {
-  //     id: order.id,
-  //     orderNumber: order.order_number,
-  //     status: order.status,
-  //     placedAt: order.placed_at!,
-  //     paidAt: order.paid_at || null,
-  //     customer: {
-  //       id: order.user.id,
-  //       name: `${order.user.firstName} ${order.user.lastName}`,
-  //       email: order.user.email,
-  //       phone: order.user.phone,
-  //     },
-  //     deliveryAddress: order.address
-  //       ? {
-  //           street: order.address.street,
-  //           city: order.address.city,
-  //           postalCode: order.address.postal_code || "",
-  //           country: order.address.country,
-  //         }
-  //       : null,
-  //     items:
-  //       order.items?.map((item) => ({
-  //         id: item.id,
-  //         name: item.item_name_snapshot,
-  //         quantity: item.quantity,
-  //         priceAtOrder: Number(item.price_at_order),
-  //         subtotal: Number(item.price_at_order) * item.quantity,
-  //       })) || [],
-  //     pricing: {
-  //       subtotal: Number(order.subtotal),
-  //       tax: Number(order.tax || 0),
-  //       discount: Number(order.discount || 0),
-  //       deliveryFee: Number(order.delivery_fee || 0),
-  //       totalAmount: Number(order.total_amount),
-  //     },
-  //     payment: {
-  //       method: order.payment_method,
-  //       status: order.payment_status,
-  //       transactionId: null,
-  //     },
-  //     delivery:
-  //       order.delivery && order.delivery.length > 0 && order.delivery[0]
-  //         ? {
-  //             id: order.delivery[0].id,
-  //             assignedAt: order.delivery[0].assigned_at || null,
-  //             acceptedAt: order.delivery[0].accepted_at || null,
-  //             completedAt: order.delivery[0].completed_at || null,
-  //             driver: order.delivery[0].deliveryUser
-  //               ? {
-  //                   id: order.delivery[0].deliveryUser.id,
-  //                   name: `${order.delivery[0].deliveryUser.firstName} ${order.delivery[0].deliveryUser.lastName}`,
-  //                   phone: order.delivery[0].deliveryUser.phone,
-  //                 }
-  //               : null,
-  //           }
-  //         : null,
-  //     statusHistory: order.statusHistory
-  //       ? order.statusHistory.map((history) => ({
-  //           id: history.id,
-  //           previousStatus: history.previous_status || null,
-  //           newStatus: history.new_status,
-  //           changedAt: history.created_at!,
-  //           changedBy: history.changedBy
-  //             ? `${history.changedBy.firstName} ${history.changedBy.lastName}`
-  //             : "System",
-  //           note: history.note || null,
-  //         }))
-  //       : [],
-  //     notes: order.notes || null,
-  //   };
+      await this.checkRestaurantAccess(order.restaurant.id, req.user!.id);
 
-  //   return res.status(200).json({
-  //     message: "Order details retrieved successfully",
-  //     data: result,
-  //   });
-  // };
+      const result = {
+        id: order.id,
+        orderNumber: order.order_number,
+        status: order.status,
+        totalAmount: Number(order.total_amount),
+        placedAt: order.placed_at,
+        customer: {
+          name: `${order.user.firstName} ${order.user.lastName}`,
+          email: order.user.email,
+          phone: order.user.phone,
+        },
+        items:
+          order.items?.map((item) => ({
+            name: item.item_name_snapshot,
+            quantity: item.quantity,
+            price: Number(item.price_at_order),
+          })) || [],
+      };
 
-  // Update order status
-  // updateOrderStatus = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<Response> => {
-  //   const orderId = req.params.orderId!;
-  //   const { status, note } = req.body as UpdateOrderStatusDto;
-  //   const order = await adminRepository.findById(orderId);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
 
-  //   if (!order) {
-  //     throw new NotfoundException("Order not found");
-  //   }
+  // PATCH /api/admin/orders/:orderId/status
+  updateOrderStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { orderId } = req.params;
+      const { status } = req.body;
 
-  //   // Verify admin has access to this order's restaurant
-  //   await this.verifyRestaurantAccess(order.restaurant.id, req.user!.id);
+      if (!orderId) throw new BadRequestException("Order ID required");
+      if (!status) throw new BadRequestException("Status required");
 
-  //   // Validate status transition
-  //   this.validateStatusTransition(order.status, status);
+      // Explicit role check - customers should never reach admin endpoints
+      if (req.user!.role === userRoleEnum.customer) {
+        throw new BadRequestException(
+          "Customers are not allowed to access admin endpoints"
+        );
+      }
 
-  //   const updatedOrder = await adminRepository.updateOrderStatus(
-  //     orderId,
-  //     status,
-  //     req.user!.id,
-  //     note
-  //   );
+      const order = await AppDataSource.getRepository(Order).findOne({
+        where: { id: orderId },
+        relations: ["restaurant"],
+      });
 
-  //   if (!updatedOrder) {
-  //     throw new ApplicationException("Failed to update order status");
-  //   }
+      if (!order) {
+        throw new NotfoundException("Order not found");
+      }
 
-  //   return res.status(200).json({
-  //     success: true,
-  //     message: "Order status updated successfully",
-  //     order: {
-  //       id: updatedOrder.id,
-  //       orderNumber: updatedOrder.order_number,
-  //       previousStatus: order.status,
-  //       newStatus: updatedOrder.status,
-  //     },
-  //   });
-  // };
+      await this.checkRestaurantAccess(order.restaurant.id, req.user!.id);
 
-  // Assign delivery person to order
-  // assignDelivery = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<Response> => {
-  //   const orderId = req.params.orderId!;
-  //   const { driverId } = req.body as AssignDeliveryDto;
-  //   const order = await adminRepository.findById(orderId);
+      await AppDataSource.getRepository(Order).update(orderId, { status });
 
-  //   if (!order) {
-  //     throw new NotfoundException("Order not found");
-  //   }
+      res.json({
+        success: true,
+        message: "Order status updated",
+        data: { orderId, newStatus: status },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
-  //   // Verify admin has access to this order's restaurant
-  //   await this.verifyRestaurantAccess(order.restaurant.id, req.user!.id);
+  // POST /api/admin/orders/:orderId/assign-delivery
+  assignDelivery = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { orderId } = req.params;
+      const { driverId } = req.body;
 
-  //   // Verify order is ready for delivery assignment
-  //   if (
-  //     order.status !== orderStatusEnum.ready &&
-  //     order.status !== orderStatusEnum.preparing
-  //   ) {
-  //     throw new BadRequestException(
-  //       "Order must be in 'ready' or 'preparing' status to assign delivery"
-  //     );
-  //   }
+      // Explicit role check - customers should never reach admin endpoints
+      if (req.user!.role === userRoleEnum.customer) {
+        throw new BadRequestException(
+          "Customers are not allowed to access admin endpoints"
+        );
+      }
 
-  //   // Verify driver exists and has delivery role
-  //   const driver = await userRepository.findById(driverId);
+      const order = await AppDataSource.getRepository(Order).findOne({
+        where: { id: orderId },
+        relations: ["restaurant"],
+      });
 
-  //   if (!driver) {
-  //     throw new NotfoundException("Driver not found");
-  //   }
+      if (!order) {
+        throw new NotfoundException("Order not found");
+      }
 
-  //   if (driver.role !== userRoleEnum.delivery) {
-  //     throw new BadRequestException("User is not a delivery driver");
-  //   }
+      await this.checkRestaurantAccess(order.restaurant.id, req.user!.id);
 
-  //   const delivery = await adminRepository.assignDelivery(orderId, driverId);
+      const driver = await AppDataSource.getRepository(User).findOne({
+        where: { id: driverId, role: userRoleEnum.delivery },
+      });
 
-  //   return res.status(200).json({
-  //     success: true,
-  //     message: "Delivery assigned successfully",
-  //     delivery: {
-  //       id: delivery.id,
-  //       orderId: orderId,
-  //       driverId: driverId,
-  //       driverName: `${driver.firstName} ${driver.lastName}`,
-  //       assignedAt: delivery.assigned_at!,
-  //     },
-  //   });
-  // };
+      if (!driver) {
+        throw new NotfoundException("Driver not found");
+      }
 
-  // Get dashboard statistics
-  // getDashboard = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<Response> => {
-  //   const restaurantId = req.params.restaurantId!;
-  //   // Verify admin has access to this restaurant
-  //   await this.verifyRestaurantAccess(restaurantId, req.user!.id);
+      const deliveryRepo = AppDataSource.getRepository(Delivery);
+      const delivery = deliveryRepo.create({
+        order: { id: orderId } as any,
+        deliveryUser: driver,
+        assigned_at: new Date(),
+      });
 
-  //   const stats = await adminRepository.getDashboardStats(restaurantId);
+      await deliveryRepo.save(delivery);
 
-  //   const result = {
-  //     activeOrders: stats.activeOrders,
-  //     pendingOrders: stats.pendingOrders,
-  //     todayStats: {
-  //       totalOrders: stats.todayStats.totalOrders,
-  //       totalRevenue: stats.todayStats.totalRevenue,
-  //       completedOrders: stats.todayStats.completedOrders,
-  //       cancelledOrders: stats.todayStats.cancelledOrders,
-  //     },
-  //     recentOrders: stats.recentOrders,
-  //   };
+      res.json({
+        success: true,
+        message: "Driver assigned successfully",
+        data: {
+          orderId,
+          driverId,
+          driverName: `${driver.firstName} ${driver.lastName}`,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
-  //   return res.status(200).json({
-  //     message: "Dashboard data retrieved successfully",
-  //     data: result,
-  //   });
-  // };
+  // POST /api/admin/restaurants/:restaurantId/assign-role
+  assignRoleToRestaurant = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { restaurantId } = req.params;
+      const { userId, role } = req.body;
 
-  // Helper: Validate status transition
-  // private validateStatusTransition(
-  //   currentStatus: orderStatusEnum,
-  //   newStatus: orderStatusEnum
-  // ) {
-  //   const validTransitions: Record<orderStatusEnum, orderStatusEnum[]> = {
-  //     [orderStatusEnum.placed]: [
-  //       orderStatusEnum.preparing,
-  //       orderStatusEnum.cancelled,
-  //     ],
-  //     [orderStatusEnum.preparing]: [
-  //       orderStatusEnum.ready,
-  //       orderStatusEnum.cancelled,
-  //     ],
-  //     [orderStatusEnum.ready]: [
-  //       orderStatusEnum.on_the_way,
-  //       orderStatusEnum.cancelled,
-  //     ],
-  //     [orderStatusEnum.on_the_way]: [
-  //       orderStatusEnum.delivered,
-  //       orderStatusEnum.cancelled,
-  //     ],
-  //     [orderStatusEnum.delivered]: [],
-  //     [orderStatusEnum.cancelled]: [],
-  //   };
+      if (!restaurantId || !userId)
+        throw new BadRequestException("Restaurant ID and User ID required");
 
-  //   const allowedTransitions = validTransitions[currentStatus] || [];
+      await this.checkRestaurantAccess(restaurantId, req.user!.id);
 
-  //   if (!allowedTransitions.includes(newStatus)) {
-  //     throw new BadRequestException(
-  //       `Invalid status transition from '${currentStatus}' to '${newStatus}'`
-  //     );
-  //   }
-  // }
+      const user = await AppDataSource.getRepository(User).findOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new NotfoundException("User not found");
+      }
+
+      const existingAdmin = await AppDataSource.getRepository(
+        RestaurantAdmin
+      ).findOne({
+        where: { user: { id: userId }, restaurant: { id: restaurantId } },
+      });
+
+      if (existingAdmin) {
+        throw new BadRequestException(
+          "User already assigned to this restaurant"
+        );
+      }
+
+      const restaurantAdmin = AppDataSource.getRepository(
+        RestaurantAdmin
+      ).create({
+        user: { id: userId } as any,
+        restaurant: { id: restaurantId } as any,
+        role: role,
+      });
+
+      await AppDataSource.getRepository(RestaurantAdmin).save(restaurantAdmin);
+
+      // Update user's system role to match restaurant role
+      if (user.role === "customer") {
+        user.role = role as any;
+        await AppDataSource.getRepository(User).save(user);
+      }
+
+      res.json({
+        success: true,
+        message: "User assigned successfully",
+        data: {
+          userId,
+          restaurantId,
+          role,
+          userName: `${user.firstName} ${user.lastName}`,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default new AdminService();
