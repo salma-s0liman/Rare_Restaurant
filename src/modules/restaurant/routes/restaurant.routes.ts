@@ -2,7 +2,7 @@ import { Router } from "express";
 import { RestaurantController } from "../controllers/restaurant.controller";
 import { CategoryController } from "../controllers/category.controller";
 import { MenuItemController } from "../controllers/menuItem.controller";
-
+import cartController from "../../cart/cart.controller";
 export const restaurantRoutes = (
   restaurantController: RestaurantController,
   categoryController: CategoryController,
@@ -34,5 +34,7 @@ export const restaurantRoutes = (
   router.post("/menu-items/:menuItemId/images", menuItemController.addImage);
   router.get("/menu-items/:menuItemId/images", menuItemController.getImages);
 
+
+  router.use('/:restaurantId/cart' ,cartController )
   return router;
 };

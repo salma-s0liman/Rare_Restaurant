@@ -9,3 +9,5 @@ export const ENV = {
   DB_PASSWORD: process.env.DATABASE_PASSWORD!,
   DB_NAME: process.env.DATABASE_NAME!,
 };
+
+
