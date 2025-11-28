@@ -3,7 +3,8 @@ import { validation } from "../../../common/middleware/validation.middleware";
 import { RestaurantController } from "../controllers/restaurant.controller";
 import { CategoryController } from "../controllers/category.controller";
 import { MenuItemController } from "../controllers/menuItem.controller";
-
+import cartController from "../../cart/cart.controller";
+import * as validators from '../validation';
 export const restaurantRoutes = (
   restaurantController: RestaurantController,
   categoryController: CategoryController,
