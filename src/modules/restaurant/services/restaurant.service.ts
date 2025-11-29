@@ -1,22 +1,19 @@
 import { RestaurantRepository } from "../repositories/restaurant.repository";
 import { CategoryRepository } from "../repositories/category.repository";
-<<<<<<< HEAD
+import { userRepository } from "../../user/user.repository";
 import {
   CreateRestaurantDto,
   UpdateRestaurantDto,
 } from "../dtos/restaurant.dto";
 import { AppDataSource } from "../../../DB/data-source";
 import { RestaurantAdmin } from "../../../DB";
-import { restaurantAdminRoleEnum, userRoleEnum } from "../../../common/enums";
-import { userRepository } from "../../user/user.repository";
-=======
-import { CreateRestaurantDto, UpdateRestaurantDto } from "../dtos/restaurant.dto";
-import { 
-  NotfoundException, 
+import {
   BadRequestException,
-  ConflictException 
+  ConflictException,
+  NotFoundException,
+  restaurantAdminRoleEnum,
+  userRoleEnum,
 } from "../../../common";
->>>>>>> 32c787ef53cfd737a70c4bc5b25570e7e17d26b5
 
 export class RestaurantService {
   constructor(
@@ -24,35 +21,11 @@ export class RestaurantService {
     private categoryRepo: CategoryRepository
   ) {}
 
-<<<<<<< HEAD
   async createRestaurant(data: CreateRestaurantDto, ownerId: string) {
-    // Create restaurant
-    const restaurant = await this.restaurantRepo.create(data);
-
-    // Auto-assign creator as owner in RestaurantAdmin table
-    const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
-    const restaurantAdmin = adminRepo.create({
-      user: { id: ownerId } as any,
-      restaurant: { id: restaurant.id } as any,
-      role: restaurantAdminRoleEnum.owner,
-    });
-
-    await adminRepo.save(restaurantAdmin);
-
-    // Update user's system role to owner
-    const user = await userRepository.findById(ownerId);
-    if (user && user.role !== userRoleEnum.owner) {
-      user.role = userRoleEnum.owner;
-      await userRepository.save(user);
-    }
-
-    return restaurant;
-=======
-  async createRestaurant(data: CreateRestaurantDto) {
     try {
       // Check for duplicate restaurant name (optional business rule)
       const existingByName = await this.restaurantRepo.findOne({
-        where: { name: data.name }
+        where: { name: data.name },
       });
 
       if (existingByName) {
@@ -61,14 +34,30 @@ export class RestaurantService {
         );
       }
 
-      return await this.restaurantRepo.create(data);
+      const restaurant = await this.restaurantRepo.create(data);
+
+      const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
+      const restaurantAdmin = adminRepo.create({
+        user: { id: ownerId } as any,
+        restaurant: { id: restaurant.id } as any,
+        role: restaurantAdminRoleEnum.owner,
+      });
+
+      await adminRepo.save(restaurantAdmin);
+
+      // Update user's system role to owner
+      const user = await userRepository.findById(ownerId);
+      if (user && user.role !== userRoleEnum.owner) {
+        user.role = userRoleEnum.owner;
+        await userRepository.save(user);
+      }
+      return restaurant;
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
       throw new BadRequestException("Failed to create restaurant");
     }
->>>>>>> 32c787ef53cfd737a70c4bc5b25570e7e17d26b5
   }
 
   async getAllRestaurants() {
@@ -92,12 +81,12 @@ export class RestaurantService {
     ]);
 
     if (!restaurant) {
-      throw new NotfoundException(`Restaurant with ID '${id}' not found`);
+      throw new NotFoundException(`Restaurant with ID '${id}' not found`);
     }
 
     // Check if restaurant is soft-deleted (inactive)
     if (!restaurant.is_active) {
-      throw new NotfoundException("Restaurant is not currently available");
+      throw new NotFoundException("Restaurant is not currently available");
     }
 
     return restaurant;
@@ -111,7 +100,7 @@ export class RestaurantService {
     // Verify restaurant exists and is active
     const existingRestaurant = await this.restaurantRepo.findById(id);
     if (!existingRestaurant) {
-      throw new NotfoundException(`Restaurant with ID '${id}' not found`);
+      throw new NotFoundException(`Restaurant with ID '${id}' not found`);
     }
 
     if (!existingRestaurant.is_active) {
@@ -121,7 +110,7 @@ export class RestaurantService {
     // Check for name conflicts if name is being updated
     if (data.name && data.name !== existingRestaurant.name) {
       const nameConflict = await this.restaurantRepo.findOne({
-        where: { name: data.name }
+        where: { name: data.name },
       });
 
       if (nameConflict && nameConflict.id !== id) {
@@ -138,7 +127,10 @@ export class RestaurantService {
       }
       return updatedRestaurant;
     } catch (error) {
-      if (error instanceof ConflictException || error instanceof BadRequestException) {
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       throw new BadRequestException("Failed to update restaurant");
@@ -153,7 +145,7 @@ export class RestaurantService {
     // Verify restaurant exists
     const restaurant = await this.restaurantRepo.findById(id);
     if (!restaurant) {
-      throw new NotfoundException(`Restaurant with ID '${id}' not found`);
+      throw new NotFoundException(`Restaurant with ID '${id}' not found`);
     }
 
     // Check if restaurant has active dependencies

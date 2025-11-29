@@ -3,14 +3,18 @@ import { validation } from "../../../common/middleware/validation.middleware";
 import { RestaurantController } from "../controllers/restaurant.controller";
 import { CategoryController } from "../controllers/category.controller";
 import { MenuItemController } from "../controllers/menuItem.controller";
-<<<<<<< HEAD
-import { auth } from "../../../common";
-import { userRoleEnum } from "../../../common/enums";
-
-=======
+import { auth, userRoleEnum } from "../../../common";
 import cartController from "../../cart/cart.controller";
-import * as validators from '../validation';
->>>>>>> 32c787ef53cfd737a70c4bc5b25570e7e17d26b5
+import {
+  createCategoryValidation,
+  createMenuItemImageValidation,
+  createMenuItemValidation,
+  createRestaurantValidation,
+  updateCategoryValidation,
+  updateMenuItemValidation,
+  updateRestaurantValidation,
+} from "../validation";
+
 export const restaurantRoutes = (
   restaurantController: RestaurantController,
   categoryController: CategoryController,
@@ -21,8 +25,8 @@ export const restaurantRoutes = (
   // RESTAURANTS
   router.post(
     "/",
-<<<<<<< HEAD
-    auth([]),
+
+    validation(createRestaurantValidation),
     restaurantController.createRestaurant
   );
   router.get("/", restaurantController.getAllRestaurants);
@@ -30,6 +34,7 @@ export const restaurantRoutes = (
   router.put(
     "/:id",
     auth([userRoleEnum.owner]),
+    validation(updateRestaurantValidation),
     restaurantController.updateRestaurant
   );
   router.delete(
@@ -37,72 +42,43 @@ export const restaurantRoutes = (
     auth([userRoleEnum.owner]),
     restaurantController.deleteRestaurant
   );
-=======
-    validation(validators.createRestaurantValidation),
-    restaurantController.createRestaurant
-  );
-  router.get(
-    "/", 
-    restaurantController.getAllRestaurants
-  );
-  router.get("/:id", restaurantController.getRestaurantById);
-  router.put(
-    "/:id",
-    validation(validators.updateRestaurantValidation),
-    restaurantController.updateRestaurant
-  );
-  router.delete("/:id", restaurantController.deleteRestaurant);
->>>>>>> 32c787ef53cfd737a70c4bc5b25570e7e17d26b5
 
   // CATEGORIES
   router.post(
     "/:restaurantId/categories",
-    validation(validators.createCategoryValidation),
-    categoryController.createCategory);
-  router.get(
-    "/:restaurantId/categories", 
-    categoryController.getCategories);
+    validation(createCategoryValidation),
+    categoryController.createCategory
+  );
+  router.get("/:restaurantId/categories", categoryController.getCategories);
   router.put(
     "/categories/:id",
-    validation(validators.updateCategoryValidation),
-    categoryController.updateCategory);
-  router.delete(
-    "/categories/:id", 
-    categoryController.deleteCategory
+    validation(updateCategoryValidation),
+    categoryController.updateCategory
   );
+  router.delete("/categories/:id", categoryController.deleteCategory);
 
   // MENU ITEMS
   router.post(
-    "/:restaurantId/menu-items", 
-    validation(validators.createMenuItemValidation),
+    "/:restaurantId/menu-items",
+    validation(createMenuItemValidation),
     menuItemController.createMenuItem
   );
-  router.get(
-    "/:restaurantId/menu-items", 
-    menuItemController.getMenuItems
-  );
+  router.get("/:restaurantId/menu-items", menuItemController.getMenuItems);
   router.put(
-    "/menu-items/:id", 
-    validation(validators.updateMenuItemValidation),
+    "/menu-items/:id",
+    validation(updateMenuItemValidation),
     menuItemController.updateMenuItem
   );
-  router.delete(
-    "/menu-items/:id", 
-    menuItemController.deleteMenuItem
-  );
+  router.delete("/menu-items/:id", menuItemController.deleteMenuItem);
 
   // MENU ITEM IMAGES
   router.post(
-    "/menu-items/:menuItemId/images", 
-    validation(validators.createMenuItemImageValidation),
+    "/menu-items/:menuItemId/images",
+    validation(createMenuItemImageValidation),
     menuItemController.addImage
   );
-  router.get(
-    "/menu-items/:menuItemId/images", 
-    menuItemController.getImages
-  );
+  router.get("/menu-items/:menuItemId/images", menuItemController.getImages);
 
-
-  router.use('/:restaurantId/cart' ,cartController )
+  router.use("/:restaurantId/cart", cartController);
   return router;
 };

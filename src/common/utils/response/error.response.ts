@@ -25,7 +25,7 @@ export class BadRequestException extends ApplicationException {
   }
 }
 
-export class NotfoundException extends ApplicationException {
+export class NotFoundException extends ApplicationException {
   constructor(message: string, cause?: unknown) {
     super(message, 404, cause);
     this.name = this.constructor.name;

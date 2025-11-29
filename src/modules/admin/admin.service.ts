@@ -3,7 +3,7 @@ import { AppDataSource } from "../../DB/data-source";
 import { RestaurantAdmin, Order, User, Delivery } from "../../DB/entity";
 import {
   BadRequestException,
-  NotfoundException,
+  NotFoundException,
   userRoleEnum,
 } from "../../common";
 
@@ -77,7 +77,7 @@ class AdminService {
       });
 
       if (!order) {
-        throw new NotfoundException("Order not found");
+        throw new NotFoundException("Order not found");
       }
 
       await this.checkRestaurantAccess(order.restaurant.id, req.user!.id);
@@ -133,7 +133,7 @@ class AdminService {
       });
 
       if (!order) {
-        throw new NotfoundException("Order not found");
+        throw new NotFoundException("Order not found");
       }
 
       await this.checkRestaurantAccess(order.restaurant.id, req.user!.id);
@@ -169,7 +169,7 @@ class AdminService {
       });
 
       if (!order) {
-        throw new NotfoundException("Order not found");
+        throw new NotFoundException("Order not found");
       }
 
       await this.checkRestaurantAccess(order.restaurant.id, req.user!.id);
@@ -179,7 +179,7 @@ class AdminService {
       });
 
       if (!driver) {
-        throw new NotfoundException("Driver not found");
+        throw new NotFoundException("Driver not found");
       }
 
       const deliveryRepo = AppDataSource.getRepository(Delivery);
@@ -225,7 +225,7 @@ class AdminService {
       });
 
       if (!user) {
-        throw new NotfoundException("User not found");
+        throw new NotFoundException("User not found");
       }
 
       const existingAdmin = await AppDataSource.getRepository(
