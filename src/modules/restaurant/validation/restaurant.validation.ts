@@ -22,7 +22,7 @@ export const createRestaurantValidation = {
       .max(5)
       .default("USD"),
 
-    isActive: z.boolean().optional().default(true),
+    is_active: z.boolean().optional().default(true),
   }),
 };
 
@@ -42,6 +42,6 @@ export const updateRestaurantValidation = {
 
     currency: z.string().min(3).max(5).optional(),
 
-    isActive: z.boolean().optional(),
+    is_active: z.boolean().optional(),
   }),
 };

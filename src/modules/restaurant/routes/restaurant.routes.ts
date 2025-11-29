@@ -25,7 +25,7 @@ export const restaurantRoutes = (
   // RESTAURANTS
   router.post(
     "/",
-
+    auth([]),
     validation(createRestaurantValidation),
     restaurantController.createRestaurant
   );

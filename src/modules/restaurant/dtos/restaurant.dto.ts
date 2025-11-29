@@ -25,6 +25,10 @@ export class CreateRestaurantDto {
   @IsOptional()
   @IsString()
   currency?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  is_active?: boolean;
 }
 
 export class UpdateRestaurantDto {
