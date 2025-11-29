@@ -1,47 +1,26 @@
-import { Repository, FindOptionsWhere, FindManyOptions } from "typeorm";
+import {  Repository } from "typeorm";
 import { Order } from "../../../DB/entity/order";
+import { BaseRepository } from "../../..//common/repositories/BaseRepository";
 
-export class OrdersRepository {
-  private repo: Repository<Order>;
+export class OrderRepository extends BaseRepository<Order> {
   constructor(repo: Repository<Order>) {
-    this.repo = repo;
+    super(repo);
   }
 
-  async create(order: Partial<Order>) {
-    // Use .create for entity instantiation, .save for persistence
-    const entity = this.repo.create(order);
-    return this.repo.save(entity);
+  async findByIdWithRelations(id: string) {
+    return this.findById(id, [
+      "items",
+      "items.menu_item",
+      "restaurant",
+      "user",
+      "statusHistory",
+    ]);
   }
 
-  async findById(id: string) {
-    return this.repo.findOne({
-      where: { id },
-      relations: [
-        "items",
-        "statusHistory",
-        "user",
-        "restaurant",
-        "address",
-        "delivery",
-        "ratingsReviews",
-      ],
+  async findByOrderNumber(orderNumber: string) {
+    return this.findOne({
+      where: { order_number: orderNumber } as any,
+      relations: ["items", "statusHistory", "restaurant", "user"],
     });
-  }
-
-  async findAll(options?: FindManyOptions<Order>) {
-    return this.repo.find(options);
-  }
-
-  async find(where: FindOptionsWhere<Order>) {
-    return this.repo.find({ where });
-  }
-
-  async update(id: string, data: Partial<Order>) {
-    await this.repo.update(id, data);
-    return this.findById(id);
-  }
-
-  async delete(id: string) {
-    return this.repo.delete(id);
   }
 }

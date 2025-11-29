@@ -13,6 +13,9 @@ export class OrderItem {
   @Column({ type: "decimal" })
   price_at_order!: number;
 
+  @Column({ type: "decimal", nullable: true })
+  total_price!: number;
+
   @Column({ type: "varchar", length: 200 })
   item_name_snapshot?: string;
 

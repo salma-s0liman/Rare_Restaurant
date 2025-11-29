@@ -1,32 +1,14 @@
+// orderStatusHistory.repository.ts
 import { Repository } from "typeorm";
 import { OrderStatusHistory } from "../../../DB/entity/orderStatusHistory";
+import { BaseRepository } from "../../../common/repositories/BaseRepository";
 
-export class OrderStatusHistoryRepository {
-  constructor(private readonly repo: Repository<OrderStatusHistory>) {}
-
-  async create(history: Partial<OrderStatusHistory>) {
-    return this.repo.save(history);
-  }
-
-  async findById(id: string) {
-    return this.repo.findOne({
-      where: { id },
-      relations: ["order", "changedBy"],
-    });
-  }
-
-  async findAll(options = {}) {
-    return this.repo.find(options);
+export class OrderStatusHistoryRepository extends BaseRepository<OrderStatusHistory> {
+  constructor(repo: Repository<OrderStatusHistory>) {
+    super(repo);
   }
 
   async findByOrder(orderId: string) {
-    return this.repo.find({
-      where: { order: { id: orderId } },
-      relations: ["order", "changedBy"],
-    });
-  }
-
-  async delete(id: string) {
-    return this.repo.delete(id);
+    return this.findAll({ where: { order: { id: orderId } } as any });
   }
 }

@@ -29,8 +29,8 @@ export class Order {
   @PrimaryGeneratedColumn("uuid")
   id: string = uuidv4().toString();
 
-  @Column({ type: "varchar", length: 100 })
-  order_number!: string;
+  @Column({ type: "int" })
+  order_number!: number;
 
   @Column({
     type: "enum",
@@ -54,7 +54,7 @@ export class Order {
   @Column({ type: "decimal" })
   total_amount!: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: "timestamp", nullable: true })
   placed_at?: Date;
 
   @Column({ type: "timestamp", nullable: true })
