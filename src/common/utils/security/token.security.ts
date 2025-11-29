@@ -86,9 +86,6 @@ export const decodedToken = async ({
   try {
     const decoded = await verifyToken({ token, signature: signatureToUse });
 
-    // DEBUG: Log the decoded token structure
-    console.log("🔍 Raw decoded token:", decoded);
-
     if (decoded.jti) {
       const { tokenRepository } = await import(
         "../../../modules/auth/token.repository"
@@ -115,18 +112,6 @@ export const decodedToken = async ({
       if (next) return next(error);
       throw error;
     }
-
-    // DEBUG: Log token decoding results
-    console.log("🔐 Token decoded - User found:", {
-      tokenUserId: decoded.id,
-      tokenEmail: decoded.email,
-      foundUser: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      },
-    });
 
     return user;
   } catch (error: any) {

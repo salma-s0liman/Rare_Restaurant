@@ -18,7 +18,7 @@ import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 import { RestaurantModule } from "./modules/restaurant/restaurant.module";
 import { CartModule } from "./modules/cart/cart.module";
- 
+import { AddressModule } from "./modules/address/address.module";
 
 // Rate limiter
 const limiter = rateLimit({
@@ -39,11 +39,11 @@ const bootstrap = async (): Promise<void> => {
   app.use(helmet());
   app.use(cors());
   app.use(limiter);
-  
+
   // Test database connection before starting server
   try {
     await AppDataSource.initialize();
-    console.log("Database connected successfully");    
+    console.log("Database connected successfully");
   } catch (err: any) {
     console.error("Database connection failed:", err.message);
     process.exit(1); // Stop the app if DB fails
@@ -57,12 +57,15 @@ const bootstrap = async (): Promise<void> => {
   // Initialize Restaurant Module
   const restaurantModule = new RestaurantModule(AppDataSource);
   const cartModule = CartModule(AppDataSource);
+  const addressModule = AddressModule(AppDataSource);
 
   // Module routing
   app.use("/restaurants", restaurantModule.router);
   app.use("/cart", cartModule);
+  app.use("/address", addressModule);
   app.use("/auth", authController);
   app.use("/admin", adminController);
+  app.use("/address", addressModule);
 
   // Global error handling
   app.use(
