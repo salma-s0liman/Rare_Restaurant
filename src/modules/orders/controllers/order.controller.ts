@@ -1,7 +1,7 @@
 import { Router } from "express";
-import * as validators from "./orders.validation";
-import { validation } from "../../common";
-import OrdersService from "./orders.service";
+import * as validators from "../validations/orders.validation";
+import { validation } from "../../../common";
+import OrdersService from "../services/order.service";
 
 const router: Router = Router();
 

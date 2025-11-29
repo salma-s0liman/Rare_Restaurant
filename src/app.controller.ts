@@ -14,7 +14,7 @@ import rateLimit from "express-rate-limit";
 // Import module routing
 import authController from "./modules/auth/auth.controller";
 import adminController from "./modules/admin/admin.controller";
-import ordersController from "./modules/orders/orders.controller";
+import ordersController from "./modules/orders/controllers/order.controller";
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 import { RestaurantModule } from "./modules/restaurant/restaurant.module";
