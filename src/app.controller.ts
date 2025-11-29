@@ -18,7 +18,8 @@ import ordersController from "./modules/orders/orders.controller";
 import { globalErrorHandling } from "./common/";
 import { AppDataSource } from "./DB/data-source";
 import { RestaurantModule } from "./modules/restaurant/restaurant.module";
-
+import { CartModule } from "./modules/cart/cart.module";
+ 
 
 // Rate limiter
 const limiter = rateLimit({
@@ -56,15 +57,14 @@ const bootstrap = async (): Promise<void> => {
 
   // Initialize Restaurant Module
   const restaurantModule = new RestaurantModule(AppDataSource);
+  const cartModule = CartModule(AppDataSource);
 
   // Module routing
   app.use("/restaurants", restaurantModule.router);
+  app.use("/cart", cartModule);
   app.use("/auth", authController);
   app.use("/admin", adminController);
   app.use("/orders", ordersController);
-
-
-
 
   // Global error handling
   app.use(

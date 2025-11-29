@@ -4,7 +4,6 @@ import { RestaurantController } from "../controllers/restaurant.controller";
 import { CategoryController } from "../controllers/category.controller";
 import { MenuItemController } from "../controllers/menuItem.controller";
 import { auth, userRoleEnum } from "../../../common";
-import cartController from "../../cart/cart.controller";
 import {
   createCategoryValidation,
   createMenuItemImageValidation,
@@ -79,6 +78,5 @@ export const restaurantRoutes = (
   );
   router.get("/menu-items/:menuItemId/images", menuItemController.getImages);
 
-  router.use("/:restaurantId/cart", cartController);
   return router;
 };

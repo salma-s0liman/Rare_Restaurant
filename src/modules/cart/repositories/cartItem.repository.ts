@@ -1,14 +1,18 @@
-import { Repository, FindOptionsWhere, FindManyOptions } from "typeorm";
+import {
+  Repository,
+  FindOptionsWhere,
+  FindManyOptions,
+} from "typeorm";
 import { CartItem } from "../../../DB/entity/cartItems";
 
 export class CartItemRepository {
   private repo: Repository<CartItem>;
-  
+
   constructor(repo: Repository<CartItem>) {
     this.repo = repo;
   }
 
-  /** Create and save a new cart item */
+  /** Create new cart item */
   async create(data: Partial<CartItem>) {
     const entity = this.repo.create(data);
     return this.repo.save(entity);
@@ -22,17 +26,17 @@ export class CartItemRepository {
     });
   }
 
-  /** Find all cart items by options */
+  /** Find all cart items */
   async findAll(options?: FindManyOptions<CartItem>) {
     return this.repo.find(options);
   }
 
-  /** Find cart items by conditions */
+  /** Basic find (no relations) */
   async find(where: FindOptionsWhere<CartItem>) {
     return this.repo.find({ where });
   }
 
-  /** Find single cart item by conditions */
+  /** Find single item with full relations */
   async findOne(where: FindOptionsWhere<CartItem>) {
     return this.repo.findOne({
       where,
@@ -40,23 +44,23 @@ export class CartItemRepository {
     });
   }
 
-  /** Update cart item (e.g., change quantity) */
+  /** Update cart item and return updated version */
   async update(id: string, data: Partial<CartItem>) {
     await this.repo.update(id, data);
     return this.findById(id);
   }
 
-  /** Delete cart item */
+  /** Delete a specific item */
   async delete(id: string) {
     return this.repo.delete(id);
   }
 
-  /** Delete all items in a cart */
+  /** Delete all items belonging to a cart */
   async deleteByCart(cartId: string) {
     return this.repo.delete({ cart: { id: cartId } });
   }
 
-  /** Find if cart already contains specific menuItem */
+  /** Check if item exists inside the cart */
   async findByCartAndMenuItem(cartId: string, menuItemId: string) {
     return this.repo.findOne({
       where: {
@@ -67,7 +71,7 @@ export class CartItemRepository {
     });
   }
 
-  /** Get all items for a given cart */
+  /** Get all items for a cart */
   async findCartItems(cartId: string) {
     return this.repo.find({
       where: { cart: { id: cartId } },

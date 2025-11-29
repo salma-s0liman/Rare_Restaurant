@@ -5,7 +5,6 @@ import { OrderStatusHistoryRepository } from "./repositories/orderStatusHistory.
 import { Order } from "../../DB/entity/order";
 import { OrderItem } from "../../DB/entity/orderItem";
 import { OrderStatusHistory } from "../../DB/entity/orderStatusHistory";
-import { orderStatusEnum } from "../../common/enums/order.enum";
 import type { Request, Response, NextFunction } from "express";
 
 const ordersRepo = new OrdersRepository(AppDataSource.getRepository(Order));

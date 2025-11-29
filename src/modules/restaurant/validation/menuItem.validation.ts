@@ -13,7 +13,7 @@ export const createMenuItemValidation = {
       .number({ error: "Price must be a number" })
       .min(0.1, "Price must be greater than zero"),
 
-    isAvailable: z.boolean().optional().default(true),
+    is_available: z.boolean().optional().default(true),
 
     restaurantId: z.string().uuid(),
     categoryId: z.string().uuid(),
@@ -30,7 +30,7 @@ export const updateMenuItemValidation = {
       .min(0.1, "Price must be greater than zero")
       .optional(),
 
-    isAvailable: z.boolean().optional(),
+    is_available: z.boolean().optional(),
     categoryId: z.string().uuid().optional(),
   }),
 };

@@ -8,12 +8,12 @@ export const createMenuItemImageValidation = {
       })
       .url("Invalid image URL format"),
 
-    altText: z
+    alt_text: z
       .string()
       .max(255)
       .optional()
       .nullable(),
 
-    isPrimary: z.boolean().optional().default(false),
+    is_primary: z.boolean().optional().default(false),
   }),
 };
