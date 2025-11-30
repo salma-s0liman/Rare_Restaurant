@@ -99,9 +99,13 @@ export const decodedToken = async ({
     }
 
     // Lazy import to avoid circular dependency
-    const { userRepository } = await import(
-      "../../../modules/user/user.repository"
+    const { UserRepository } = await import(
+      "../../../modules/user/repositories/user.repository"
     );
+    const { AppDataSource } = await import("../../../DB/data-source");
+    const { User } = await import("../../../DB/entity/user");
+    
+    const userRepository = new UserRepository(AppDataSource.getRepository(User));
     const user = await userRepository.findById(decoded.id);
 
     if (!user) {

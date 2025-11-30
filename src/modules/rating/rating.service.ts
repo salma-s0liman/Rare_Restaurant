@@ -3,7 +3,7 @@ import { AdminResponseDto } from "./rating.dto";
 import {
   ApplicationException,
   BadRequestException,
-  NotfoundException,
+  NotFoundException,
 } from "../../common";
 import {
   ratingRepository,
@@ -63,7 +63,7 @@ class RatingService {
       const review = await ratingRepository.findOne({
         where: { id: ratingId },
       });
-      if (!review) throw new NotfoundException("Review not found");
+      if (!review) throw new NotFoundException("Review not found");
 
       const existingResponse = await ratingRepository.findOne({
         where: { id: ratingId },

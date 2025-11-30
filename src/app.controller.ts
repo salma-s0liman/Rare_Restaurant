@@ -20,6 +20,7 @@ import { RestaurantModule } from "./modules/restaurant/restaurant.module";
 import { CartModule } from "./modules/cart/cart.module";
 import { AddressModule } from "./modules/address/address.module";
 import { OrdersModule } from "./modules/orders/orders.module";
+import { UserModule } from "./modules/user/user.module";
 
 // Rate limiter
 const limiter = rateLimit({
@@ -60,12 +61,14 @@ const bootstrap = async (): Promise<void> => {
   const cartModule = CartModule(AppDataSource);
   const addressModule = AddressModule(AppDataSource);
   const ordersModule = OrdersModule(AppDataSource);
+  const userModule = UserModule(AppDataSource);
 
   // Module routing
   app.use("/restaurants", restaurantModule.router);
   app.use("/cart", cartModule);
   app.use("/address", addressModule);
   app.use("/orders", ordersModule);
+  app.use("/users", userModule);
   app.use("/auth", authController);
   app.use("/admin", adminController);
 

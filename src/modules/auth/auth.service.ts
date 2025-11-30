@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { ILoginBodyInputsDto, ISignupBodyInputsDto } from "./auth.dto";
-import { userRepository } from "../user/user.repository";
+import { UserRepository } from "../user/repositories/user.repository";
+import { AppDataSource } from "../../DB/data-source";
+import { User } from "../../DB/entity/user";
 import { tokenRepository } from "./token.repository";
 import {
   ApplicationException,
@@ -35,6 +37,8 @@ class AuthenticationService {
       vehicleInfo,
       isActive,
     } = req.body as ISignupBodyInputsDto;
+    
+    const userRepository = new UserRepository(AppDataSource.getRepository(User));
     const checkUserExist = await userRepository.findByEmail(email);
 
     if (checkUserExist) {
@@ -78,6 +82,7 @@ class AuthenticationService {
   ): Promise<Response> => {
     const { email, password } = req.body as ILoginBodyInputsDto;
 
+    const userRepository = new UserRepository(AppDataSource.getRepository(User));
     const user = await userRepository.findOne({
       where: { email },
       select: ["id", "email", "password", "role", "firstName", "lastName"],
@@ -140,6 +145,7 @@ class AuthenticationService {
       }
 
       // 2. Verify user exists
+      const userRepository = new UserRepository(AppDataSource.getRepository(User));
       const user = await userRepository.findById(decoded.id);
       if (!user) {
         throw new BadRequestException("User not found");

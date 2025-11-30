@@ -10,7 +10,7 @@ import {
   CreateMenuItemImageDto,
 } from "../dtos/menuItemImage.dto";
 import { 
-  NotfoundException, 
+  NotFoundException, 
   BadRequestException,
   ConflictException 
 } from "../../../common";
@@ -35,7 +35,7 @@ export class MenuItemService {
     // Verify restaurant exists and is active
     const restaurant = await this.restaurantRepo?.findById(data.restaurantId);
     if (!restaurant) {
-      throw new NotfoundException(`Restaurant with ID '${data.restaurantId}' not found`);
+      throw new NotFoundException(`Restaurant with ID '${data.restaurantId}' not found`);
     }
 
     if (!restaurant.is_active) {
@@ -45,7 +45,7 @@ export class MenuItemService {
     // Verify category exists and belongs to the restaurant
     const category = await this.categoryRepo?.findById(data.categoryId, ["restaurant"]);
     if (!category) {
-      throw new NotfoundException(`Category with ID '${data.categoryId}' not found`);
+      throw new NotFoundException(`Category with ID '${data.categoryId}' not found`);
     }
 
     if (category.restaurant.id !== data.restaurantId) {
@@ -88,7 +88,7 @@ export class MenuItemService {
     // Verify restaurant exists and is active
     const restaurant = await this.restaurantRepo?.findById(restaurantId);
     if (!restaurant) {
-      throw new NotfoundException(`Restaurant with ID '${restaurantId}' not found`);
+      throw new NotFoundException(`Restaurant with ID '${restaurantId}' not found`);
     }
 
     if (!restaurant.is_active) {
@@ -110,7 +110,7 @@ export class MenuItemService {
     // Verify menu item exists
     const existingMenuItem = await this.menuItemRepo.findById(id, ["restaurant", "category"]);
     if (!existingMenuItem) {
-      throw new NotfoundException(`Menu item with ID '${id}' not found`);
+      throw new NotFoundException(`Menu item with ID '${id}' not found`);
     }
 
     // Verify restaurant is still active
@@ -127,7 +127,7 @@ export class MenuItemService {
     if (data.categoryId && data.categoryId !== existingMenuItem.category.id) {
       const newCategory = await this.categoryRepo?.findById(data.categoryId, ["restaurant"]);
       if (!newCategory) {
-        throw new NotfoundException(`Category with ID '${data.categoryId}' not found`);
+        throw new NotFoundException(`Category with ID '${data.categoryId}' not found`);
       }
 
       if (newCategory.restaurant.id !== existingMenuItem.restaurant.id) {
@@ -176,7 +176,7 @@ export class MenuItemService {
     // Verify menu item exists
     const menuItem = await this.menuItemRepo.findById(id, ["restaurant", "images"]);
     if (!menuItem) {
-      throw new NotfoundException(`Menu item with ID '${id}' not found`);
+      throw new NotFoundException(`Menu item with ID '${id}' not found`);
     }
 
     // Verify restaurant is active
@@ -212,7 +212,7 @@ export class MenuItemService {
     // Verify menu item exists
     const menuItem = await this.menuItemRepo.findById(menuItemId, ["restaurant"]);
     if (!menuItem) {
-      throw new NotfoundException(`Menu item with ID '${menuItemId}' not found`);
+      throw new NotFoundException(`Menu item with ID '${menuItemId}' not found`);
     }
 
     // Verify restaurant is active
@@ -238,7 +238,7 @@ export class MenuItemService {
     // Verify menu item exists
     const menuItem = await this.menuItemRepo.findById(menuItemId, ["restaurant"]);
     if (!menuItem) {
-      throw new NotfoundException(`Menu item with ID '${menuItemId}' not found`);
+      throw new NotFoundException(`Menu item with ID '${menuItemId}' not found`);
     }
 
     // Verify restaurant is active

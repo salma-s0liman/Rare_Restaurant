@@ -62,6 +62,16 @@ export class User {
   @Column({ type: "boolean", default: null })
   is_active?: boolean;
 
+  @Column({ type: "varchar", length: 255, nullable: true })
+  profilePicture?: string;
+
+  // User preferences
+  @Column({ type: "varchar", length: 10, default: 'en' })
+  language?: string;
+
+  @Column({ type: "varchar", length: 10, default: 'USD' })
+  currency?: string;
+
   @OneToMany(() => Address, (address) => address.user)
   addresses?: Address[];
 

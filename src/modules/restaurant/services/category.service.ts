@@ -2,7 +2,7 @@ import { CategoryRepository } from "../repositories/category.repository";
 import { RestaurantRepository } from "../repositories/restaurant.repository";
 import { CreateCategoryDto, UpdateCategoryDto } from "../dtos/category.dto";
 import { 
-  NotfoundException, 
+  NotFoundException, 
   BadRequestException,
   ConflictException 
 } from "../../../common";
@@ -21,7 +21,7 @@ export class CategoryService {
     // Verify restaurant exists and is active
     const restaurant = await this.restaurantRepo?.findById(data.restaurantId);
     if (!restaurant) {
-      throw new NotfoundException(`Restaurant with ID '${data.restaurantId}' not found`);
+      throw new NotFoundException(`Restaurant with ID '${data.restaurantId}' not found`);
     }
 
     if (!restaurant.is_active) {
@@ -58,7 +58,7 @@ export class CategoryService {
     // Verify restaurant exists and is active
     const restaurant = await this.restaurantRepo?.findById(restaurantId);
     if (!restaurant) {
-      throw new NotfoundException(`Restaurant with ID '${restaurantId}' not found`);
+      throw new NotFoundException(`Restaurant with ID '${restaurantId}' not found`);
     }
 
     if (!restaurant.is_active) {
@@ -80,7 +80,7 @@ export class CategoryService {
     // Verify category exists
     const existingCategory = await this.categoryRepo.findById(id, ["restaurant"]);
     if (!existingCategory) {
-      throw new NotfoundException(`Category with ID '${id}' not found`);
+      throw new NotFoundException(`Category with ID '${id}' not found`);
     }
 
     // Verify restaurant is still active
@@ -129,7 +129,7 @@ export class CategoryService {
     // Verify category exists
     const category = await this.categoryRepo.findById(id, ["restaurant", "menu_items"]);
     if (!category) {
-      throw new NotfoundException(`Category with ID '${id}' not found`);
+      throw new NotFoundException(`Category with ID '${id}' not found`);
     }
 
     // Check if category has menu items

@@ -1,11 +1,12 @@
 import { RestaurantRepository } from "../repositories/restaurant.repository";
 import { CategoryRepository } from "../repositories/category.repository";
-import { userRepository } from "../../user/user.repository";
+import { UserRepository } from "../../user/repositories/user.repository";
+import { AppDataSource } from "../../../DB/data-source";
+import { User } from "../../../DB/entity/user";
 import {
   CreateRestaurantDto,
   UpdateRestaurantDto,
 } from "../dtos/restaurant.dto";
-import { AppDataSource } from "../../../DB/data-source";
 import { RestaurantAdmin } from "../../../DB";
 import {
   BadRequestException,
@@ -46,10 +47,11 @@ export class RestaurantService {
       await adminRepo.save(restaurantAdmin);
 
       // Update user's system role to owner
+      const userRepository = new UserRepository(AppDataSource.getRepository(User));
       const user = await userRepository.findById(ownerId);
       if (user && user.role !== userRoleEnum.owner) {
         user.role = userRoleEnum.owner;
-        await userRepository.save(user);
+        await userRepository.update(ownerId, { role: userRoleEnum.owner });
       }
       return restaurant;
     } catch (error) {
