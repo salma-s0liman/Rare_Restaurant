@@ -19,6 +19,7 @@ import { AppDataSource } from "./DB/data-source";
 import { RestaurantModule } from "./modules/restaurant/restaurant.module";
 import { CartModule } from "./modules/cart/cart.module";
 import { AddressModule } from "./modules/address/address.module";
+import { OrdersModule } from "./modules/orders/orders.module";
 
 // Rate limiter
 const limiter = rateLimit({
@@ -54,18 +55,19 @@ const bootstrap = async (): Promise<void> => {
     res.json({ message: `Hello from ${process.env.APPLICATION_NAME}` });
   });
 
-  // Initialize Restaurant Module
+  // Initialize modules
   const restaurantModule = new RestaurantModule(AppDataSource);
   const cartModule = CartModule(AppDataSource);
   const addressModule = AddressModule(AppDataSource);
+  const ordersModule = OrdersModule(AppDataSource);
 
   // Module routing
   app.use("/restaurants", restaurantModule.router);
   app.use("/cart", cartModule);
   app.use("/address", addressModule);
+  app.use("/orders", ordersModule);
   app.use("/auth", authController);
   app.use("/admin", adminController);
-  app.use("/address", addressModule);
 
   // Global error handling
   app.use(

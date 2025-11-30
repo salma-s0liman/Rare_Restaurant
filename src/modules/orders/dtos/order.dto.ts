@@ -1,37 +1,144 @@
-// create-order.dto.ts
-import {
-  IsUUID,
-  IsOptional,
-  ValidateNested,
-  ArrayMinSize,
-  IsArray,
-  IsBoolean,
-  IsString,
-  Length,
-} from "class-validator";
-import { Type } from "class-transformer";
-import { CreateOrderItemDto } from "./orderItem.dto";
+import { z } from "zod";
+import { orderStatusEnum, paymentMethodEnum, paymentStatusEnum } from "../../../common/enums";
 
-export class CreateOrderDto {
-  @IsUUID("4", { message: "restaurantId must be a valid UUID" })
-  restaurantId!: string;
+export const CreateOrderDto = z.object({
+  cartId: z.string()
+    .trim()
+    .min(1, "Cart ID is required")
+    .uuid("Invalid cart ID format"),
+  
+  addressId: z.string()
+    .trim()
+    .min(1, "Address ID is required")
+    .uuid("Invalid address ID format"),
+  
+  paymentMethod: z.nativeEnum(paymentMethodEnum, {
+    message: "Invalid payment method"
+  }),
+  
+  notes: z.string()
+    .trim()
+    .max(500, "Notes cannot exceed 500 characters")
+    .optional(),
+  
+  deliveryFee: z.number()
+    .min(0, "Delivery fee cannot be negative")
+    .max(999.99, "Delivery fee too high")
+    .optional()
+    .default(0),
+  
+  discount: z.number()
+    .min(0, "Discount cannot be negative")
+    .max(999.99, "Discount too high")
+    .optional()
+    .default(0),
+  
+  tax: z.number()
+    .min(0, "Tax cannot be negative")
+    .max(999.99, "Tax too high")
+    .optional()
+    .default(0)
+});
 
-  @IsOptional()
-  @IsUUID("4", { message: "addressId must be a valid UUID" })
-  addressId?: string;
+export const UpdateOrderStatusDto = z.object({
+  status: z.nativeEnum(orderStatusEnum, {
+    message: "Invalid order status"
+  }),
+  
+  notes: z.string()
+    .trim()
+    .max(500, "Notes cannot exceed 500 characters")
+    .optional(),
+  
+  changedBy: z.string()
+    .trim()
+    .min(1, "Changed by user ID is required")
+    .uuid("Invalid user ID format")
+});
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateOrderItemDto)
-  @ArrayMinSize(1, { message: "At least one order item is required" })
-  items!: CreateOrderItemDto[];
+// Get Orders Query DTO
+export const GetOrdersQueryDto = z.object({
+  status: z.nativeEnum(orderStatusEnum).optional(),
+  paymentStatus: z.nativeEnum(paymentStatusEnum).optional(),
+  userId: z.string().trim().uuid().optional(),
+  restaurantId: z.string().trim().uuid().optional(),
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(20),
+  sortBy: z.enum(["placed_at", "total_amount", "status"]).default("placed_at"),
+  sortOrder: z.enum(["ASC", "DESC"]).default("DESC")
+});
 
-  @IsOptional()
-  @IsString()
-  @Length(0, 500)
-  notes?: string;
+// Type exports
+export type CreateOrderDto = z.infer<typeof CreateOrderDto>;
+export type UpdateOrderStatusDto = z.infer<typeof UpdateOrderStatusDto>;
+export type GetOrdersQueryDto = z.infer<typeof GetOrdersQueryDto>;
 
-  @IsOptional()
-  @IsBoolean()
-  isPrepaid?: boolean;
+// Response DTOs
+export interface OrderSummaryDto {
+  id: string;
+  orderNumber: number;
+  status: orderStatusEnum;
+  paymentStatus: paymentStatusEnum;
+  totalAmount: number;
+  placedAt: Date;
+  customer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  restaurant: {
+    id: string;
+    name: string;
+  };
+  itemCount: number;
 }
+
+export interface OrderDetailDto {
+  id: string;
+  orderNumber: number;
+  status: orderStatusEnum;
+  subtotal: number;
+  tax: number;
+  discount: number;
+  deliveryFee: number;
+  totalAmount: number;
+  placedAt: Date;
+  paidAt?: Date;
+  paymentStatus: paymentStatusEnum;
+  paymentMethod: paymentMethodEnum;
+  notes?: string;
+  customer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  restaurant: {
+    id: string;
+    name: string;
+    phone?: string;
+    address?: string;
+  };
+  address: {
+    street: string;
+    city: string;
+    postalCode?: string;
+    country: string;
+  };
+  items: Array<{
+    id: string;
+    itemNameSnapshot: string;
+    quantity: number;
+    priceAtOrder: number;
+    subtotal: number;
+  }>;
+  statusHistory: Array<{
+    previousStatus?: orderStatusEnum;
+    newStatus: orderStatusEnum;
+    changedAt: Date;
+    changedBy?: string;
+    notes?: string;
+  }>;
+}
+

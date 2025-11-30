@@ -1,24 +1,29 @@
-import { IsUUID, IsInt, Min, IsOptional, IsString, Length } from "class-validator";
-import { Type } from "class-transformer";
+import { z } from "zod";
 
-export class CreateOrderItemDto {
-    @IsUUID("4", { message: "menuItemId must be a valid UUID" })
-    menuItemId!: string;
+// Create Order Item DTO
+export const CreateOrderItemDto = z.object({
+  menuItemId: z.string()
+    .trim()
+    .min(1, "Menu item ID is required")
+    .uuid("Invalid menu item ID format"),
+  
+  quantity: z.number()
+    .int("Quantity must be a whole number")
+    .min(1, "Quantity must be at least 1")
+    .max(99, "Quantity cannot exceed 99"),
+  
+  priceAtOrder: z.number()
+    .min(0, "Price cannot be negative")
+    .max(9999.99, "Price too high"),
+  
+  itemNameSnapshot: z.string()
+    .trim()
+    .min(1, "Item name is required")
+    .max(200, "Item name too long")
+});
 
-    @IsInt({ message: "quantity must be an integer" })
-    @Min(1, { message: "quantity must be at least 1" })
-    @Type(() => Number)
-    quantity!: number;
+export type CreateOrderItemDto = z.infer<typeof CreateOrderItemDto>;
 
-    @IsInt({ message: "priceAtOrder must be an integer" })
-    @Type(() => Number)
-    price_at_order!: number;
-
-    @IsOptional()
-    @IsString()
-    @Length(1, 200)
-    itemNameSnapshot?: string;
-}
 
 
 
