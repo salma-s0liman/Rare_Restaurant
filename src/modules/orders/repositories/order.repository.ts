@@ -1,9 +1,10 @@
 import { Repository } from "typeorm";
 import { Order } from "../../../DB/entity/order";
 import { BaseRepository } from "../../../common/repositories/BaseRepository";
-import { 
+import {
   BadRequestException,
-  ApplicationException 
+  ApplicationException,
+  orderStatusEnum,
 } from "../../../common";
 
 export class OrderRepository extends BaseRepository<Order> {
@@ -26,7 +27,7 @@ export class OrderRepository extends BaseRepository<Order> {
         "statusHistory.changedBy",
         "address",
         "delivery",
-        "delivery.driver"
+        "delivery.deliveryUser",
       ]);
     } catch (error: any) {
       throw new ApplicationException(`Failed to find order: ${error.message}`);
@@ -41,10 +42,19 @@ export class OrderRepository extends BaseRepository<Order> {
     try {
       return this.findOne({
         where: { order_number: orderNumber },
-        relations: ["items", "items.menu_item", "statusHistory", "restaurant", "user", "address"],
+        relations: [
+          "items",
+          "items.menu_item",
+          "statusHistory",
+          "restaurant",
+          "user",
+          "address",
+        ],
       });
     } catch (error: any) {
-      throw new ApplicationException(`Failed to find order by number: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to find order by number: ${error.message}`
+      );
     }
   }
 
@@ -56,11 +66,13 @@ export class OrderRepository extends BaseRepository<Order> {
     try {
       return this.findAll({
         where: { user: { id: userId } },
-        relations: ["restaurant", "items", "items.menu_item"],
-        order: { placed_at: "DESC" }
+        relations: ["restaurant", "user", "items", "items.menu_item"],
+        order: { placed_at: "DESC" },
       });
     } catch (error: any) {
-      throw new ApplicationException(`Failed to find user orders: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to find user orders: ${error.message}`
+      );
     }
   }
 
@@ -73,18 +85,28 @@ export class OrderRepository extends BaseRepository<Order> {
       return this.findAll({
         where: { restaurant: { id: restaurantId } },
         relations: ["user", "items", "items.menu_item", "delivery"],
-        order: { placed_at: "DESC" }
+        order: { placed_at: "DESC" },
       });
     } catch (error: any) {
-      throw new ApplicationException(`Failed to find restaurant orders: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to find restaurant orders: ${error.message}`
+      );
     }
   }
 
   async generateOrderNumber(): Promise<number> {
     try {
       const today = new Date();
-      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+      const startOfDay = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
+      const endOfDay = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() + 1
+      );
 
       // Find the last order number for today
       const lastOrder = await this.repo
@@ -95,7 +117,9 @@ export class OrderRepository extends BaseRepository<Order> {
         .getOne();
 
       // Generate next number
-      const datePrefix = parseInt(today.toISOString().slice(2, 10).replace(/-/g, "")); // YYMMDD
+      const datePrefix = parseInt(
+        today.toISOString().slice(2, 10).replace(/-/g, "")
+      ); // YYMMDD
       const baseNumber = datePrefix * 10000; // YYMMDD0000
 
       if (!lastOrder) {
@@ -106,7 +130,9 @@ export class OrderRepository extends BaseRepository<Order> {
       const lastSequence = lastNumber % 10000; // Get last 4 digits
       return baseNumber + lastSequence + 1;
     } catch (error: any) {
-      throw new ApplicationException(`Failed to generate order number: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to generate order number: ${error.message}`
+      );
     }
   }
 
@@ -114,15 +140,65 @@ export class OrderRepository extends BaseRepository<Order> {
     if (!orderId || !userId) {
       throw new BadRequestException("Order ID and User ID are required");
     }
-    
+
     try {
       const order = await this.repo.findOne({
-        where: { id: orderId, user: { id: userId } }
+        where: { id: orderId, user: { id: userId } },
       });
-      
+
       return !!order;
     } catch (error: any) {
-      throw new ApplicationException(`Failed to verify order ownership: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to verify order ownership: ${error.message}`
+      );
+    }
+  }
+
+  async createOrderFromCartItems(data: {
+    orderNumber: number;
+    userId: string;
+    restaurantId: string;
+    addressId: string;
+    paymentMethod: string;
+    notes?: string;
+    cartItems: Array<{
+      menuItemId: string;
+      menuItemName: string;
+      quantity: number;
+      priceAtAdd: number;
+    }>;
+  }): Promise<Order> {
+    try {
+      // Calculate totals
+      const subtotal = data.cartItems.reduce(
+        (sum, item) => sum + item.priceAtAdd * item.quantity,
+        0
+      );
+      const tax = subtotal * 0.1;
+      const deliveryFee = 50;
+      const totalAmount = subtotal + tax + deliveryFee;
+
+      // Create order using repository save
+      const order = await this.repo.save({
+        order_number: data.orderNumber,
+        status: orderStatusEnum.placed,
+        payment_status: "pending",
+        subtotal: subtotal,
+        tax: tax,
+        delivery_fee: deliveryFee,
+        total_amount: totalAmount,
+        payment_method: data.paymentMethod,
+        notes: data.notes,
+        user: { id: data.userId },
+        restaurant: { id: data.restaurantId },
+        address: { id: data.addressId },
+      } as any);
+
+      return order;
+    } catch (error: any) {
+      throw new ApplicationException(
+        `Failed to create order from cart: ${error.message}`
+      );
     }
   }
 }
