@@ -21,6 +21,7 @@ import { CartModule } from "./modules/cart/cart.module";
 import { AddressModule } from "./modules/address/address.module";
 import { OrdersModule } from "./modules/orders/orders.module";
 import { UserModule } from "./modules/user/user.module";
+import { setupSwagger } from "./swagger/swagger.config";
 
 // Rate limiter
 const limiter = rateLimit({
@@ -41,6 +42,9 @@ const bootstrap = async (): Promise<void> => {
   app.use(helmet());
   app.use(cors());
   app.use(limiter);
+
+  // Setup Swagger API Documentation
+  setupSwagger(app);
 
   // Test database connection before starting server
   try {
@@ -85,6 +89,7 @@ const bootstrap = async (): Promise<void> => {
   // Start server
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    console.log(`API Documentation: http://localhost:${port}/api-docs`);
   });
 };
 
