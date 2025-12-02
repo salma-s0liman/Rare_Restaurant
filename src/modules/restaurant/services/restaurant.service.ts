@@ -47,7 +47,9 @@ export class RestaurantService {
       await adminRepo.save(restaurantAdmin);
 
       // Update user's system role to owner
-      const userRepository = new UserRepository(AppDataSource.getRepository(User));
+      const userRepository = new UserRepository(
+        AppDataSource.getRepository(User)
+      );
       const user = await userRepository.findById(ownerId);
       if (user && user.role !== userRoleEnum.owner) {
         user.role = userRoleEnum.owner;
@@ -94,7 +96,11 @@ export class RestaurantService {
     return restaurant;
   }
 
-  async updateRestaurant(id: string, data: UpdateRestaurantDto) {
+  async updateRestaurant(
+    id: string,
+    data: UpdateRestaurantDto,
+    userId: string
+  ) {
     if (!id) {
       throw new BadRequestException("Restaurant ID is required");
     }
@@ -107,6 +113,21 @@ export class RestaurantService {
 
     if (!existingRestaurant.is_active) {
       throw new BadRequestException("Cannot update inactive restaurant");
+    }
+
+    // Check if user is admin of this restaurant
+    const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
+    const isAdmin = await adminRepo.findOne({
+      where: {
+        user: { id: userId } as any,
+        restaurant: { id } as any,
+      },
+    });
+
+    if (!isAdmin) {
+      throw new BadRequestException(
+        "You don't have permission to update this restaurant"
+      );
     }
 
     // Check for name conflicts if name is being updated
@@ -139,7 +160,7 @@ export class RestaurantService {
     }
   }
 
-  async deleteRestaurant(id: string) {
+  async deleteRestaurant(id: string, userId: string) {
     if (!id) {
       throw new BadRequestException("Restaurant ID is required");
     }
@@ -148,6 +169,21 @@ export class RestaurantService {
     const restaurant = await this.restaurantRepo.findById(id);
     if (!restaurant) {
       throw new NotFoundException(`Restaurant with ID '${id}' not found`);
+    }
+
+    // Check if user is admin of this restaurant
+    const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
+    const isAdmin = await adminRepo.findOne({
+      where: {
+        user: { id: userId } as any,
+        restaurant: { id } as any,
+      },
+    });
+
+    if (!isAdmin) {
+      throw new BadRequestException(
+        "You don't have permission to delete this restaurant"
+      );
     }
 
     // Check if restaurant has active dependencies
@@ -164,21 +200,6 @@ export class RestaurantService {
       return !!result;
     } catch (error) {
       throw new BadRequestException("Failed to delete restaurant");
-    }
-  }
-
-  async getCategoriesByRestaurant(restaurantId: string) {
-    if (!restaurantId) {
-      throw new BadRequestException("Restaurant ID is required");
-    }
-
-    // Verify restaurant exists and is active
-    await this.getRestaurantById(restaurantId);
-
-    try {
-      return await this.categoryRepo.findByRestaurant(restaurantId);
-    } catch (error) {
-      throw new BadRequestException("Failed to retrieve categories");
     }
   }
 }

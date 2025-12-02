@@ -1,11 +1,13 @@
 import { CategoryRepository } from "../repositories/category.repository";
 import { RestaurantRepository } from "../repositories/restaurant.repository";
 import { CreateCategoryDto, UpdateCategoryDto } from "../dtos/category.dto";
-import { 
-  NotFoundException, 
+import {
+  NotFoundException,
   BadRequestException,
-  ConflictException 
+  ConflictException,
 } from "../../../common";
+import { AppDataSource } from "../../../DB/data-source";
+import { RestaurantAdmin } from "../../../DB";
 
 export class CategoryService {
   constructor(
@@ -13,7 +15,7 @@ export class CategoryService {
     private restaurantRepo?: RestaurantRepository
   ) {}
 
-  async createCategory(data: CreateCategoryDto) {
+  async createCategory(data: CreateCategoryDto, userId: string) {
     if (!data.restaurantId) {
       throw new BadRequestException("Restaurant ID is required");
     }
@@ -21,17 +23,38 @@ export class CategoryService {
     // Verify restaurant exists and is active
     const restaurant = await this.restaurantRepo?.findById(data.restaurantId);
     if (!restaurant) {
-      throw new NotFoundException(`Restaurant with ID '${data.restaurantId}' not found`);
+      throw new NotFoundException(
+        `Restaurant with ID '${data.restaurantId}' not found`
+      );
     }
 
     if (!restaurant.is_active) {
-      throw new BadRequestException("Cannot create category for inactive restaurant");
+      throw new BadRequestException(
+        "Cannot create category for inactive restaurant"
+      );
+    }
+
+    // Check if user is admin of this restaurant
+    const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
+    const isAdmin = await adminRepo.findOne({
+      where: {
+        user: { id: userId } as any,
+        restaurant: { id: data.restaurantId } as any,
+      },
+    });
+
+    if (!isAdmin) {
+      throw new BadRequestException(
+        "You don't have permission to create categories for this restaurant"
+      );
     }
 
     // Check for duplicate category name within the same restaurant
-    const existingCategories = await this.categoryRepo.findByRestaurant(data.restaurantId);
+    const existingCategories = await this.categoryRepo.findByRestaurant(
+      data.restaurantId
+    );
     const nameConflict = existingCategories.find(
-      category => category.name.toLowerCase() === data.name.toLowerCase()
+      (category) => category.name.toLowerCase() === data.name.toLowerCase()
     );
 
     if (nameConflict) {
@@ -43,7 +66,7 @@ export class CategoryService {
     try {
       return await this.categoryRepo.create({
         ...data,
-        restaurant: { id: data.restaurantId } as any
+        restaurant: { id: data.restaurantId } as any,
       });
     } catch (error) {
       throw new BadRequestException("Failed to create category");
@@ -58,7 +81,9 @@ export class CategoryService {
     // Verify restaurant exists and is active
     const restaurant = await this.restaurantRepo?.findById(restaurantId);
     if (!restaurant) {
-      throw new NotFoundException(`Restaurant with ID '${restaurantId}' not found`);
+      throw new NotFoundException(
+        `Restaurant with ID '${restaurantId}' not found`
+      );
     }
 
     if (!restaurant.is_active) {
@@ -72,20 +97,39 @@ export class CategoryService {
     }
   }
 
-  async updateCategory(id: string, data: UpdateCategoryDto) {
+  async updateCategory(id: string, data: UpdateCategoryDto, userId: string) {
     if (!id) {
       throw new BadRequestException("Category ID is required");
     }
 
     // Verify category exists
-    const existingCategory = await this.categoryRepo.findById(id, ["restaurant"]);
+    const existingCategory = await this.categoryRepo.findById(id, [
+      "restaurant",
+    ]);
     if (!existingCategory) {
       throw new NotFoundException(`Category with ID '${id}' not found`);
     }
 
     // Verify restaurant is still active
     if (!existingCategory.restaurant?.is_active) {
-      throw new BadRequestException("Cannot update category for inactive restaurant");
+      throw new BadRequestException(
+        "Cannot update category for inactive restaurant"
+      );
+    }
+
+    // Check if user is admin of this restaurant
+    const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
+    const isAdmin = await adminRepo.findOne({
+      where: {
+        user: { id: userId } as any,
+        restaurant: { id: existingCategory.restaurant.id } as any,
+      },
+    });
+
+    if (!isAdmin) {
+      throw new BadRequestException(
+        "You don't have permission to update this category"
+      );
     }
 
     // Check for name conflicts within the same restaurant if name is being updated
@@ -93,10 +137,10 @@ export class CategoryService {
       const siblingCategories = await this.categoryRepo.findByRestaurant(
         existingCategory.restaurant.id
       );
-      
+
       const nameConflict = siblingCategories.find(
-        category => 
-          category.id !== id && 
+        (category) =>
+          category.id !== id &&
           category.name.toLowerCase() === data.name!.toLowerCase()
       );
 
@@ -114,20 +158,26 @@ export class CategoryService {
       }
       return updatedCategory;
     } catch (error) {
-      if (error instanceof ConflictException || error instanceof BadRequestException) {
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       throw new BadRequestException("Failed to update category");
     }
   }
 
-  async deleteCategory(id: string) {
+  async deleteCategory(id: string, userId: string) {
     if (!id) {
       throw new BadRequestException("Category ID is required");
     }
 
     // Verify category exists
-    const category = await this.categoryRepo.findById(id, ["restaurant", "menu_items"]);
+    const category = await this.categoryRepo.findById(id, [
+      "restaurant",
+      "menu_items",
+    ]);
     if (!category) {
       throw new NotFoundException(`Category with ID '${id}' not found`);
     }
@@ -141,7 +191,24 @@ export class CategoryService {
 
     // Verify restaurant is active
     if (!category.restaurant?.is_active) {
-      throw new BadRequestException("Cannot delete category from inactive restaurant");
+      throw new BadRequestException(
+        "Cannot delete category from inactive restaurant"
+      );
+    }
+
+    // Check if user is admin of this restaurant
+    const adminRepo = AppDataSource.getRepository(RestaurantAdmin);
+    const isAdmin = await adminRepo.findOne({
+      where: {
+        user: { id: userId } as any,
+        restaurant: { id: category.restaurant.id } as any,
+      },
+    });
+
+    if (!isAdmin) {
+      throw new BadRequestException(
+        "You don't have permission to delete this category"
+      );
     }
 
     try {

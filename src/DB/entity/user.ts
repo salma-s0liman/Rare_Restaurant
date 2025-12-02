@@ -63,7 +63,7 @@ export class User {
   is_active?: boolean;
 
   @Column({ type: "varchar", length: 255, nullable: true })
-  profilePicture?: string;
+  profile_picture?: string;
 
   // User preferences
   @Column({ type: "varchar", length: 10, default: 'en' })

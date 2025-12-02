@@ -1,12 +1,12 @@
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 import { UserRepository } from "./repositories";
 import { User } from "../../DB/entity/user";
 import { genderEnum } from "../../common/enums";
-import { 
-  NotFoundException, 
+import {
+  NotFoundException,
   UnauthorizedException,
   ApplicationException,
-  ConflictException 
+  ConflictException,
 } from "../../common";
 import {
   UpdateUserProfileType,
@@ -14,7 +14,7 @@ import {
   UserPreferencesType,
   ProfilePictureType,
   DeactivateAccountType,
-  SearchUsersType
+  SearchUsersType,
 } from "./user.validation";
 
 export class UserService {
@@ -34,11 +34,16 @@ export class UserService {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to get user profile: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to get user profile: ${error.message}`
+      );
     }
   }
 
-  async updateUserProfile(userId: string, updateData: UpdateUserProfileType): Promise<User> {
+  async updateUserProfile(
+    userId: string,
+    updateData: UpdateUserProfileType
+  ): Promise<User> {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
@@ -47,7 +52,9 @@ export class UserService {
 
       // Check if phone number is already taken by another user
       if (updateData.phone && updateData.phone !== user.phone) {
-        const existingUser = await this.userRepository.findByPhone(updateData.phone);
+        const existingUser = await this.userRepository.findByPhone(
+          updateData.phone
+        );
         if (existingUser && existingUser.id !== userId) {
           throw new ConflictException("Phone number already exists");
         }
@@ -59,7 +66,10 @@ export class UserService {
         updatePayload.gender = updateData.gender as genderEnum;
       }
 
-      const updatedUser = await this.userRepository.update(userId, updatePayload);
+      const updatedUser = await this.userRepository.update(
+        userId,
+        updatePayload
+      );
       if (!updatedUser) {
         throw new ApplicationException("Failed to update user profile");
       }
@@ -70,11 +80,16 @@ export class UserService {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to update user profile: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to update user profile: ${error.message}`
+      );
     }
   }
 
-  async changePassword(userId: string, passwordData: ChangePasswordType): Promise<void> {
+  async changePassword(
+    userId: string,
+    passwordData: ChangePasswordType
+  ): Promise<void> {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
@@ -82,27 +97,38 @@ export class UserService {
       }
 
       // Verify current password
-      const isCurrentPasswordValid = await bcrypt.compare(passwordData.currentPassword, user.password);
+      const isCurrentPasswordValid = await bcrypt.compare(
+        passwordData.currentPassword,
+        user.password
+      );
       if (!isCurrentPasswordValid) {
         throw new UnauthorizedException("Current password is incorrect");
       }
 
       // Hash new password
       const saltRounds = 12;
-      const hashedNewPassword = await bcrypt.hash(passwordData.newPassword, saltRounds);
+      const hashedNewPassword = await bcrypt.hash(
+        passwordData.newPassword,
+        saltRounds
+      );
 
       await this.userRepository.update(userId, {
-        password: hashedNewPassword
+        password: hashedNewPassword,
       });
     } catch (error: any) {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to change password: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to change password: ${error.message}`
+      );
     }
   }
 
-  async updateProfilePicture(userId: string, profileData: ProfilePictureType): Promise<User> {
+  async updateProfilePicture(
+    userId: string,
+    profileData: ProfilePictureType
+  ): Promise<User> {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
@@ -110,7 +136,7 @@ export class UserService {
       }
 
       const updatedUser = await this.userRepository.update(userId, {
-        profilePicture: profileData.profilePicture || undefined
+        profile_picture: profileData.profilePicture || undefined,
       });
 
       if (!updatedUser) {
@@ -123,7 +149,9 @@ export class UserService {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to update profile picture: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to update profile picture: ${error.message}`
+      );
     }
   }
 
@@ -136,18 +164,23 @@ export class UserService {
 
       // Return default preferences if not set
       return {
-        language: user.language ?? 'en',
-        currency: user.currency ?? 'USD'
+        language: user.language ?? "en",
+        currency: user.currency ?? "USD",
       };
     } catch (error: any) {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to get user preferences: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to get user preferences: ${error.message}`
+      );
     }
   }
 
-  async updateUserPreferences(userId: string, preferences: UserPreferencesType): Promise<any> {
+  async updateUserPreferences(
+    userId: string,
+    preferences: UserPreferencesType
+  ): Promise<any> {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
@@ -161,7 +194,9 @@ export class UserService {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to update user preferences: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to update user preferences: ${error.message}`
+      );
     }
   }
 
@@ -177,11 +212,16 @@ export class UserService {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to get user stats: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to get user stats: ${error.message}`
+      );
     }
   }
 
-  async deactivateAccount(userId: string, deactivationData: DeactivateAccountType): Promise<void> {
+  async deactivateAccount(
+    userId: string,
+    deactivationData: DeactivateAccountType
+  ): Promise<void> {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
@@ -189,7 +229,10 @@ export class UserService {
       }
 
       // Verify password before deactivation
-      const isPasswordValid = await bcrypt.compare(deactivationData.password, user.password);
+      const isPasswordValid = await bcrypt.compare(
+        deactivationData.password,
+        user.password
+      );
       if (!isPasswordValid) {
         throw new UnauthorizedException("Incorrect password");
       }
@@ -202,7 +245,9 @@ export class UserService {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to deactivate account: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to deactivate account: ${error.message}`
+      );
     }
   }
 
@@ -216,7 +261,9 @@ export class UserService {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to reactivate account: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to reactivate account: ${error.message}`
+      );
     }
   }
 
@@ -226,7 +273,7 @@ export class UserService {
       const users = await this.userRepository.searchUsers(searchTerm, role);
 
       // Remove passwords and paginate
-      const usersWithoutPasswords = users.map(user => {
+      const usersWithoutPasswords = users.map((user) => {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword as User;
       });
@@ -240,39 +287,45 @@ export class UserService {
         total: users.length,
         page,
         limit,
-        totalPages: Math.ceil(users.length / limit)
+        totalPages: Math.ceil(users.length / limit),
       };
     } catch (error: any) {
       if (error instanceof ApplicationException) {
         throw error;
       }
-      throw new ApplicationException(`Failed to search users: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to search users: ${error.message}`
+      );
     }
   }
 
   async getUsersByRole(role: string): Promise<User[]> {
     try {
       const users = await this.userRepository.findActiveUsers(role);
-      
-      return users.map(user => {
+
+      return users.map((user) => {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword as User;
       });
     } catch (error: any) {
-      throw new ApplicationException(`Failed to get users by role: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to get users by role: ${error.message}`
+      );
     }
   }
 
   async getAllActiveUsers(): Promise<User[]> {
     try {
       const users = await this.userRepository.findActiveUsers();
-      
-      return users.map(user => {
+
+      return users.map((user) => {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword as User;
       });
     } catch (error: any) {
-      throw new ApplicationException(`Failed to get active users: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to get active users: ${error.message}`
+      );
     }
   }
 
@@ -285,7 +338,9 @@ export class UserService {
       }
       return user;
     } catch (error: any) {
-      throw new ApplicationException(`Failed to get user with relations: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to get user with relations: ${error.message}`
+      );
     }
   }
 }

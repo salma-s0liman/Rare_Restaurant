@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export const addCartItem = {
   params: z.object({
-    cartId: z.string().uuid("cartId must be a valid UUID"),
+    cartId: z.uuid("cartId must be a valid UUID"),
   }),
 
   body: z.object({
-    menuItemId: z.string().uuid("menuItemId must be a valid UUID"),
+    menuItemId: z.uuid("menuItemId must be a valid UUID"),
     quantity: z
       .number()
       .min(1, "quantity must be at least 1"),
@@ -15,7 +15,7 @@ export const addCartItem = {
 
 export const updateCartItem = {
   params: z.object({
-    cartItemId: z.string().uuid("cartItemId must be a valid UUID"),
+    cartItemId: z.uuid("cartItemId must be a valid UUID"),
   }),
 
   body: z.object({
@@ -27,6 +27,6 @@ export const updateCartItem = {
 
 export const deleteCartItem = {
   params: z.object({
-    cartItemId: z.string().uuid("cartItemId must be a valid UUID"),
+    cartItemId: z.uuid("cartItemId must be a valid UUID"),
   }),
 };

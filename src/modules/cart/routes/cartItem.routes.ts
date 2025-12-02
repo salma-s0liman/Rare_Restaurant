@@ -3,6 +3,7 @@ import { Router } from "express";
 import { CartItemController } from "../controllers/cartItem.controller";
 import { validation } from "../../../common/middleware/validation.middleware";
 import * as validators from "../validators/cartItem.validation";
+import { auth } from "../../../common";
 
 export function createCartItemRouter(cartItemController: CartItemController) {
   const router = Router();
@@ -10,6 +11,7 @@ export function createCartItemRouter(cartItemController: CartItemController) {
   // add item to cart
   router.post(
     "/carts/:cartId/items",
+    auth([]),
     validation(validators.addCartItem),
     cartItemController.addItem
   );
@@ -17,6 +19,7 @@ export function createCartItemRouter(cartItemController: CartItemController) {
   // update cart item
   router.patch(
     "/cart-items/:cartItemId",
+    auth([]),
     validation(validators.updateCartItem),
     cartItemController.updateItem
   );
@@ -24,6 +27,7 @@ export function createCartItemRouter(cartItemController: CartItemController) {
   // delete cart item
   router.delete(
     "/cart-items/:cartItemId",
+    auth([]),
     validation(validators.deleteCartItem),
     cartItemController.deleteItem
   );

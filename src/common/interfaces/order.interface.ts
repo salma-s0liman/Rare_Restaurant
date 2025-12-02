@@ -1,3 +1,5 @@
+import { orderStatusEnum } from "../enums";
+
 export interface DashboardStatsDto {
   activeOrders: number;
   pendingOrders: number;
@@ -71,3 +73,18 @@ export interface OrderDetailDto {
     note?: string;
   }>;
 }
+
+// Status History Response DTO
+export interface StatusHistoryDto {
+  id: string;
+  previousStatus?: orderStatusEnum;
+  newStatus: orderStatusEnum;
+  changedAt: Date;
+  changedBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  note?: string;
+}
+

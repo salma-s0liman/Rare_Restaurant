@@ -2,9 +2,7 @@ import { z } from "zod";
 
 // Create Order Item DTO
 export const CreateOrderItemDto = z.object({
-  menuItemId: z.string()
-    .trim()
-    .min(1, "Menu item ID is required")
+  menuItemId: z
     .uuid("Invalid menu item ID format"),
   
   quantity: z.number()

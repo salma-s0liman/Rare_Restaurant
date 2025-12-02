@@ -65,7 +65,7 @@ const bootstrap = async (): Promise<void> => {
 
   // Module routing
   app.use("/restaurants", restaurantModule.router);
-  app.use("/cart", cartModule);
+  app.use("/", cartModule);
   app.use("/address", addressModule);
   app.use("/orders", ordersModule);
   app.use("/users", userModule);

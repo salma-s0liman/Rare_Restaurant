@@ -66,9 +66,11 @@ export class RestaurantController {
   ) => {
     try {
       const id = req.params.id!;
+      const userId = req.user!.id;
       const result = await this.restaurantService.updateRestaurant(
         id,
-        req.body
+        req.body,
+        userId
       );
       res.json({
         success: true,
@@ -87,7 +89,8 @@ export class RestaurantController {
   ) => {
     try {
       const id = req.params.id!;
-      const success = await this.restaurantService.deleteRestaurant(id);
+      const userId = req.user!.id;
+      const success = await this.restaurantService.deleteRestaurant(id, userId);
       res.json({
         success,
         message: success

@@ -2,17 +2,13 @@ import { z } from "zod";
 import { orderStatusEnum, paymentMethodEnum, paymentStatusEnum } from "../../../common/enums";
 
 export const CreateOrderDto = z.object({
-  cartId: z.string()
-    .trim()
-    .min(1, "Cart ID is required")
-    .uuid("Invalid cart ID format"),
+  cartId: z
+    .uuid("Invalid cart ID format").trim(),
   
-  addressId: z.string()
-    .trim()
-    .min(1, "Address ID is required")
-    .uuid("Invalid address ID format"),
+  addressId: z
+    .uuid("Invalid address ID format").trim(),
   
-  paymentMethod: z.nativeEnum(paymentMethodEnum, {
+  paymentMethod: z.enum(paymentMethodEnum, {
     message: "Invalid payment method"
   }),
   
@@ -41,7 +37,7 @@ export const CreateOrderDto = z.object({
 });
 
 export const UpdateOrderStatusDto = z.object({
-  status: z.nativeEnum(orderStatusEnum, {
+  status: z.enum(orderStatusEnum, {
     message: "Invalid order status"
   }),
   
@@ -58,10 +54,10 @@ export const UpdateOrderStatusDto = z.object({
 
 // Get Orders Query DTO
 export const GetOrdersQueryDto = z.object({
-  status: z.nativeEnum(orderStatusEnum).optional(),
-  paymentStatus: z.nativeEnum(paymentStatusEnum).optional(),
-  userId: z.string().trim().uuid().optional(),
-  restaurantId: z.string().trim().uuid().optional(),
+  status: z.enum(orderStatusEnum).optional(),
+  paymentStatus: z.enum(paymentStatusEnum).optional(),
+  userId: z.uuid().optional(),
+  restaurantId: z.uuid().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
   sortBy: z.enum(["placed_at", "total_amount", "status"]).default("placed_at"),
