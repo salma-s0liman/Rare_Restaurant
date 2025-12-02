@@ -2,10 +2,7 @@
 import { Repository } from "typeorm";
 import { OrderStatusHistory } from "../../../DB/entity/orderStatusHistory";
 import { BaseRepository } from "../../../common/repositories/BaseRepository";
-import { 
-  BadRequestException,
-  ApplicationException 
-} from "../../../common";
+import { BadRequestException, ApplicationException } from "../../../common";
 
 export class OrderStatusHistoryRepository extends BaseRepository<OrderStatusHistory> {
   constructor(repo: Repository<OrderStatusHistory>) {
@@ -18,13 +15,15 @@ export class OrderStatusHistoryRepository extends BaseRepository<OrderStatusHist
     }
 
     try {
-      return this.findAll({ 
+      return this.findAll({
         where: { order: { id: orderId } },
         relations: ["changedBy"],
-        order: { created_at: "DESC" }
+        order: { created_at: "DESC" },
       });
     } catch (error: any) {
-      throw new ApplicationException(`Failed to find order status history: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to find order status history: ${error.message}`
+      );
     }
   }
 
@@ -36,17 +35,23 @@ export class OrderStatusHistoryRepository extends BaseRepository<OrderStatusHist
     note?: string;
   }) {
     try {
-      const statusHistory = {
+      const statusHistory: any = {
         order: { id: data.orderId },
         previous_status: data.previousStatus as any,
         new_status: data.newStatus as any,
-        changedBy: data.changedById ? { id: data.changedById } : undefined,
-        note: data.note
+        note: data.note,
       };
 
-      return await this.create(statusHistory);
+      if (data.changedById) {
+        statusHistory.changedBy = { id: data.changedById };
+      }
+
+      // Use repo directly to avoid relation issues
+      return await this.repo.save(statusHistory);
     } catch (error: any) {
-      throw new ApplicationException(`Failed to create status history: ${error.message}`);
+      throw new ApplicationException(
+        `Failed to create status history: ${error.message}`
+      );
     }
   }
 }
