@@ -24,3 +24,18 @@ export const CreateOrderStatusHistoryDto = z.object({
 
 export type CreateOrderStatusHistoryDto = z.infer<typeof CreateOrderStatusHistoryDto>;
 
+// Status History Response DTO
+export interface StatusHistoryDto {
+  id: string;
+  previousStatus?: orderStatusEnum;
+  newStatus: orderStatusEnum;
+  note?: string;
+  changedAt: Date;
+  changedBy?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+}
+

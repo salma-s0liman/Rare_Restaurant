@@ -40,7 +40,18 @@ const bootstrap = async (): Promise<void> => {
   // Global middleware
   app.use(express.json());
   app.use(helmet());
-  app.use(cors());
+  
+  // CORS configuration for frontend access
+  const corsOptions = {
+    origin: process.env.FRONTEND_URL || "*", // Allow frontend URL or all origins in development
+    credentials: true, // Allow cookies and authentication headers
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 86400 // Cache preflight requests for 24 hours
+  };
+  
+  app.use(cors(corsOptions));
   app.use(limiter);
 
   // Setup Swagger API Documentation

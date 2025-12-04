@@ -28,6 +28,7 @@ export class OrderStatusHistoryService {
         changedAt: history.changed_at,
         changedBy: history.changedBy ? {
           id: history.changedBy.id,
+          email: history.changedBy.email,
           firstName: history.changedBy.firstName,
           lastName: history.changedBy.lastName
         } : undefined,
@@ -83,6 +84,7 @@ export class OrderStatusHistoryService {
         changedAt: latest.created_at!,
         changedBy: latest.changedBy ? {
           id: latest.changedBy.id,
+          email: latest.changedBy.email,
           firstName: latest.changedBy.firstName,
           lastName: latest.changedBy.lastName
         } : undefined,
