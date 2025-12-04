@@ -129,14 +129,17 @@ export class UserService {
     userId: string,
     profileData: ProfilePictureType
   ): Promise<User> {
-    try {
+    // TODO: Re-enable when profile_picture column is added to database
+    throw new ApplicationException("Profile picture feature is temporarily disabled pending database migration", 501);
+    
+    /* try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
         throw new NotFoundException("User not found");
       }
 
       const updatedUser = await this.userRepository.update(userId, {
-        profile_picture: profileData.profilePicture || undefined,
+        profilePicture: profileData.profilePicture || undefined,
       });
 
       if (!updatedUser) {
@@ -152,11 +155,14 @@ export class UserService {
       throw new ApplicationException(
         `Failed to update profile picture: ${error.message}`
       );
-    }
+    } */
   }
 
   async getUserPreferences(userId: string): Promise<any> {
-    try {
+    // TODO: Re-enable when language and currency columns are added to database
+    throw new ApplicationException("User preferences feature is temporarily disabled pending database migration", 501);
+    
+    /* try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
         throw new NotFoundException("User not found");
@@ -174,14 +180,17 @@ export class UserService {
       throw new ApplicationException(
         `Failed to get user preferences: ${error.message}`
       );
-    }
+    } */
   }
 
   async updateUserPreferences(
     userId: string,
     preferences: UserPreferencesType
   ): Promise<any> {
-    try {
+    // TODO: Re-enable when language and currency columns are added to database
+    throw new ApplicationException("User preferences feature is temporarily disabled pending database migration", 501);
+    
+    /* try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
         throw new NotFoundException("User not found");
@@ -197,7 +206,7 @@ export class UserService {
       throw new ApplicationException(
         `Failed to update user preferences: ${error.message}`
       );
-    }
+    } */
   }
 
   async getUserStats(userId: string): Promise<any> {

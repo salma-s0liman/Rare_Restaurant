@@ -56,21 +56,22 @@ export class User {
   @Column({ type: "timestamp", nullable: true })
   lastLoginAt?: Date;
 
-  @Column({ type: "varchar", length: 255 })
+  @Column({ type: "varchar", length: 255, nullable: true })
   vehicle_info?: string;
 
-  @Column({ type: "boolean", default: null })
+  @Column({ type: "boolean", default: true })
   is_active?: boolean;
 
-  @Column({ type: "varchar", length: 255, nullable: true })
-  profile_picture?: string;
+  // Commented out until database columns are created
+  // @Column({ type: "varchar", length: 255, nullable: true, name: "profile_picture" })
+  // profilePicture?: string;
 
-  // User preferences
-  @Column({ type: "varchar", length: 10, default: 'en' })
-  language?: string;
+  // User preferences - commented out until database columns are created
+  // @Column({ type: "varchar", length: 10, default: 'en' })
+  // language?: string;
 
-  @Column({ type: "varchar", length: 10, default: 'USD' })
-  currency?: string;
+  // @Column({ type: "varchar", length: 10, default: 'USD' })
+  // currency?: string;
 
   @OneToMany(() => Address, (address) => address.user)
   addresses?: Address[];
