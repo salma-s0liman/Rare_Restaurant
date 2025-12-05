@@ -57,7 +57,7 @@ export const globalErrorHandling = (
 ) => {
   return res.status(error.statusCode || 500).json({
     err_message: error.message || "Someting went wrong",
-    stack: process.env.MOOD === "development" ? error.stack : undefined,
+    stack: process.env.MODE === "development" ? error.stack : undefined,
     cause: error.cause,
   });
 };
