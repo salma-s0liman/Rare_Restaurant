@@ -65,7 +65,14 @@ export const decodedToken = async ({
   tokenType = tokenTypeEnum.Access,
   next,
 }: IDecodeParams): Promise<User | void> => {
-  const token = authorization;
+  // Extract token from "Bearer TOKEN" or just "TOKEN"
+  let token = authorization;
+
+  if (authorization.toLowerCase().startsWith("bearer ")) {
+    token = authorization.substring(7); // Remove "Bearer " prefix
+  }
+
+  console.log("Token after extraction:", token.substring(0, 50) + "...");
 
   if (!token) {
     const error = new ApplicationException(
@@ -82,6 +89,8 @@ export const decodedToken = async ({
     tokenType === tokenTypeEnum.Access
       ? signatures.accessSignature
       : signatures.refreshSignature;
+
+  console.log("Using signature type:", tokenType);
 
   try {
     const decoded = await verifyToken({ token, signature: signatureToUse });
@@ -104,8 +113,10 @@ export const decodedToken = async ({
     );
     const { AppDataSource } = await import("../../../DB/data-source");
     const { User } = await import("../../../DB/entity/user");
-    
-    const userRepository = new UserRepository(AppDataSource.getRepository(User));
+
+    const userRepository = new UserRepository(
+      AppDataSource.getRepository(User)
+    );
     const user = await userRepository.findById(decoded.id);
 
     if (!user) {

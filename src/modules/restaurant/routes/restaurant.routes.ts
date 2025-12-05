@@ -82,7 +82,7 @@ export const restaurantRoutes = (
    */
   router.post(
     "/",
-   // auth([]),
+    auth([]),
     validation(validators.createRestaurantValidation),
     restaurantController.createRestaurant
   );

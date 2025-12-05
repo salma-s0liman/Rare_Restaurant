@@ -10,6 +10,8 @@ export const auth = (accessRoles: string[] = []) => {
     try {
       const { authorization } = req.headers;
 
+      console.log("Authorization header received:", authorization);
+
       if (!authorization) {
         return next(
           new ApplicationException("Authorization header missing", 401)

@@ -40,6 +40,8 @@
     "nodemailer": "^7.0.10",
     "reflect-metadata": "^0.2.2",
     "sql2": "^0.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.27",
     "zod": "^4.1.12"
   }
