@@ -12,7 +12,7 @@ import {
   BadRequestException,
   ConflictException,
   NotFoundException,
-  restaurantAdminRoleEnum,
+  // restaurantAdminRoleEnum,
   userRoleEnum,
 } from "../../../common";
 
@@ -41,7 +41,7 @@ export class RestaurantService {
       const restaurantAdmin = adminRepo.create({
         user: { id: ownerId } as any,
         restaurant: { id: restaurant.id } as any,
-        role: restaurantAdminRoleEnum.owner,
+        role: userRoleEnum.owner,
       });
 
       await adminRepo.save(restaurantAdmin);
